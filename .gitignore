@@ -6,6 +6,8 @@
 .\#*
 *.pyc
 
+output/
+
 *.eps
 *.pdf
 *.ps

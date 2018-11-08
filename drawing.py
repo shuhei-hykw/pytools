@@ -13,6 +13,10 @@ Supported detectors are as follows.
  - FBH
  - SCH
  - TOF
+ - EMULSION
+ - TRIGGER
+ - MATRIX
+ - DAQ
 '''
 
 import argparse
@@ -27,29 +31,61 @@ scale = 1
 detector_name = ''
 default_text_size = 5
 no_view_label = True
+wdaq = 50
+hdaq = 10
 
 #_______________________________________________________________________________
-def draw_arrow(moveto, width, height, mark=0): # mark = 0:both 1:first 2:last 3:none
+def draw_arrow(moveto, width, height, mark=0, color='black'): # mark = 0:both 1:first 2:last 3:none
   ''' draw arrow '''
+  if width == 0 and height == 0: return
+  lw = 0.1 if detector_name == 'DAQ' else 0.1
+  msize = 1.5 if detector_name == 'DAQ' else 1.0
+  print('0 setgray')
+  if color == 'red': print('0.9 0 0 setrgbcolor')
+  elif color == 'green': print('0 0.8 0 setrgbcolor')
+  elif color == 'blue': print('0 0 0.9 setrgbcolor')
+  elif color == 'cyan': print('0.9 0 0 0 setcmykcolor')
+  elif color == 'magenta': print('0 0.9 0 0 setcmykcolor')
+  elif color == 'orange': print('0 0.53 1 0 setcmykcolor')
+  elif color == 'purple': print('0 0.9 0 0.4 setcmykcolor')
+  elif color == 'yellow': print('0 0 0.9 0 setcmykcolor')
+  elif color == 'tag': lw = 0.5
   print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
   if width == 0:
     theta = 0.5*math.pi
   else:
     theta = math.atan(height/width)
   if mark == 0 or mark == 1:
-    print('{} {} rlineto'.format(math.cos(theta) + 0.5*math.sin(theta),
-                                 math.sin(theta) - 0.5*math.cos(theta)))
-    print('{} {} rlineto'.format(-math.sin(theta), math.cos(theta)))
-    print('{} {} rlineto'.format(-math.cos(theta) + 0.5*math.sin(theta),
-                                 -math.sin(theta) - 0.5*math.cos(theta)))
+    print('{} {} rlineto'.format(msize*(math.cos(theta) + 0.5*math.sin(theta)),
+                                 msize*(math.sin(theta) - 0.5*math.cos(theta))))
+    print('{} {} rlineto'.format(msize*(-math.sin(theta)), msize*(math.cos(theta))))
+    print('{} {} rlineto'.format(msize*(-math.cos(theta) + 0.5*math.sin(theta)),
+                                 msize*(-math.sin(theta) - 0.5*math.cos(theta))))
+    m1 = [moveto[0] + msize*(math.cos(theta) + 0.5*math.sin(theta)),
+          moveto[1] + msize*(math.sin(theta) - 0.5*math.cos(theta))]
+    m2 = [m1[0] - msize*math.sin(theta), m1[1] + msize*math.cos(theta)]
+    mi = [0.5*(m1[0] + m2[0]), 0.5*(m1[1] + m2[1])]
+  else:
+    mi = moveto
   print('{} {} rlineto'.format(width, height))
   if mark == 0 or mark == 2:
-    print('{} {} rlineto'.format(-math.cos(theta) + 0.5*math.sin(theta),
-                                 -math.sin(theta) - 0.5*math.cos(theta)))
-    print('{} {} rlineto'.format(-math.sin(theta), math.cos(theta)))
-    print('{} {} rlineto'.format(math.cos(theta) + 0.5*math.sin(theta),
-                                 math.sin(theta) - 0.5*math.cos(theta)))
-  print('closepath gsave fill grestore {} setlinewidth stroke'.format(0.0001 if mark != 3 else 0.1))
+    print('{} {} rlineto'.format(msize*(-math.cos(theta) + 0.5*math.sin(theta)),
+                                 msize*(-math.sin(theta) - 0.5*math.cos(theta))))
+    print('{} {} rlineto'.format(-msize*math.sin(theta), msize*math.cos(theta)))
+    print('{} {} rlineto'.format(msize*(math.cos(theta) + 0.5*math.sin(theta)),
+                                 msize*(math.sin(theta) - 0.5*math.cos(theta))))
+    m3 = [moveto[0] + msize*(-math.cos(theta) + 0.5*math.sin(theta)) + width,
+          moveto[1] + msize*(-math.sin(theta) - 0.5*math.cos(theta)) + height]
+    m4 = [m3[0] - msize*math.sin(theta), m3[1] + msize*math.cos(theta)]
+    mf = [0.5*(m3[0] + m4[0]), 0.5*(m3[1] + m4[1])]
+  else:
+    mf = [moveto[0] + width, moveto[1] + height]
+  print('closepath gsave fill grestore {} setlinewidth stroke'
+        .format(0.0001 if mark != 3 else lw))
+  if mark != 3:
+    print('newpath {} {} moveto'.format(mi[0], mi[1]))
+    print('{} {} rlineto'.format(mf[0] - mi[0], mf[1] - mi[1]))
+    print('closepath gsave fill grestore {} setlinewidth stroke'.format(lw))
 
 #_______________________________________________________________________________
 def draw_circle(moveto, r, fill_color=1.0, a=0, b=360, line_width=0.1):
@@ -67,6 +103,16 @@ def draw_detector():
   ''' draw detector '''
   global scale
   line_width = 0.4
+  ''' EMULSION '''
+  if 'EMULSION' in detector_name:
+    return draw_emulsion()
+  ''' TRIGGER '''
+  if 'TRIG' in detector_name:
+    return draw_trigger()
+  if 'MATRIX' in detector_name:
+    return draw_matrix()
+  if 'DAQ' in detector_name:
+    return draw_daq()
   ''' BFT '''
   if detector_name == 'BFT':
     scale = 12.0
@@ -544,6 +590,12 @@ def draw_detector():
 #_______________________________________________________________________________
 def draw_line_with_scale(moveto, width, height, rotate=False):
   ''' draw line with scale '''
+  rwidth = width/scale
+  if abs(rwidth - round(rwidth)) < 0.0001:
+    rwidth = round(rwidth)
+  if detector_name == 'EMULSION':
+    lr = -1 if rotate else 1
+    rotate= False
   if detector_name != 'BACp':
     for i in range(2):
       if rotate:
@@ -566,7 +618,13 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       if detector_name == 'TOF':
         moveto[0] += 1
   else:
-    if width/scale > 5 or 'BC' in detector_name or detector_name == 'BFT':
+    if detector_name == 'EMULSION' and width > 2:
+      moveto[1] += height * 0.75
+      draw_arrow(moveto, width, 0)
+      moveto[1] += height * 0.25
+      if rwidth == 100:
+        moveto[0] += lr*width*0.75
+    elif width > 5 or 'BC' in detector_name or detector_name == 'BFT':
       moveto[1] += height * 0.75
       draw_arrow(moveto, width, 0)
     else:
@@ -582,13 +640,13 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
   print('{} {} moveto'.format(moveto[0] if rotate else moveto[0] + 0.5*width,
                               moveto[1]+height/2 if rotate else moveto[1]+1))
   if rotate:
-    print('({}) dup stringwidth pop 0 exch -2 div 0 exch rmoveto'
-          .format(int(height/scale) if height/scale - int(height/scale) == 0 else height/scale))
-  real_length = (1805 if detector_name == 'TOF' and width > 100 else
+    print('({}) dup stringwidth pop 0 exch -2 div 0 exch rmoveto'.format(rwidth))
+  real_length = (11760 if detector_name == 'EMULSION' and rwidth > 1000 else
+                 1805 if detector_name == 'TOF' and width > 100 else
                  673 if detector_name == 'SCH' and width > 100 else
-                 height/scale if rotate else width/scale)
+                 height/scale if rotate else rwidth)
   print('({}) dup stringwidth pop -2 div 0 rmoveto {} show {}'
-        .format(int(real_length) if real_length - int(real_length) == 0 else real_length,
+        .format(round(real_length) if abs(real_length - round(real_length)) < 0.001 else real_length,
                 '90 rotate' if rotate else '',
                 '-90 rotate' if rotate else ''))
 
@@ -607,6 +665,9 @@ def draw_polygon(moveto, array, line_width=0.1, fill_color=1.0):
 #_______________________________________________________________________________
 def draw_square(moveto, width, height, line_width=0.1, fill_color=1.0):
   ''' draw square '''
+  if detector_name == 'DAQ':
+    line_width = 0.1
+  print('0 setgray')
   print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
   print('{} {} rlineto'.format(width, 0))
   print('{} {} rlineto'.format(0, height))
@@ -645,6 +706,7 @@ def draw_wave(moveto, width, height):
 #_______________________________________________________________________________
 def draw_text(moveto, text, rotate=False, text_size=5):
   ''' draw text '''
+  print('0 setgray')
   print('/Times-Roman findfont {} scalefont setfont'.format(text_size))
   print('{} {} moveto'.format(moveto[0], moveto[1]))
   if rotate:
@@ -652,6 +714,479 @@ def draw_text(moveto, text, rotate=False, text_size=5):
   print('({}) dup stringwidth pop 2 div 0 exch sub 0 rmoveto {} show {}'
         .format(text, '90 rotate' if rotate else '', '-90 rotate' if rotate else ''))
   print('/Times-Roman findfont {} scalefont setfont'.format(default_text_size))
+
+#_______________________________________________________________________________
+def draw_text_box(moveto, text, text_size=5.):
+  ''' draw text box '''
+  t = text.split()
+  w = (text_size*max(len(t[0]), len(t[1])) if len(t) > 1 else text_size*len(text))
+  h = text_size*9 if len(t) > 1 else text_size*2
+  if detector_name == 'DAQ':
+    w = wdaq
+    h = hdaq
+  draw_square(moveto, w, h, 0.1, 0.95 if 'RM' in text else -1)
+  print('0 setgray')
+  print('/Times-Roman findfont {} scalefont setfont'.format(text_size))
+  print('{} {} moveto'.format(moveto[0]+w/2, moveto[1]))
+  print('({}) dup stringwidth pop neg 2 div 0 rmoveto'.format(text))
+  print('0 {} rmoveto show'.format(h/2.-text_size/3))
+  print('/Times-Roman findfont {} scalefont setfont'.format(default_text_size))
+
+#_______________________________________________________________________________
+def draw_logic_or(moveto, size=1.0, etcline=True):
+  ''' draw AND logic '''
+  width = 3.0*size
+  height = 2.4*size
+  if etcline:
+    for i in range(3):
+      draw_arrow([moveto[0]-width*0.3, moveto[1]+height*(0.8-i*0.1)], width*0.6, 0, 3)
+      draw_circle([moveto[0], moveto[1]+height*(0.5-i*0.1)], 0.04*size, 0.1)
+  print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
+  for i in range(2):
+    width = width*0.3 if i == 1 else width
+    offset = width*0.2 if i == 0 else 0
+    print('{} {} {} {} {} {} curveto'.format(moveto[0]+width, moveto[1]+height*(1+i%2)/3-offset,
+                                             moveto[0]+width, moveto[1]+height*(2-i%2)/3+offset,
+                                             moveto[0], moveto[1]+height*(1-i%2)))
+  print('closepath gsave 1 setgray fill grestore 0 setgray 0.1 setlinewidth stroke')
+
+#_______________________________________________________________________________
+def draw_logic_and(moveto, size=1.0, etcline=False):
+  ''' draw AND logic '''
+  width = 1.*size
+  height = 1.5*size
+  #moveto[1] = moveto[1] - 0.25*size
+  moveto[1] = moveto[1] + 0.5*size
+  if etcline:
+    for i in range(3):
+      draw_arrow([moveto[0]-width*0.3, moveto[1]+height*(0.8-i*0.1)], width*0.6, 0, 3)
+      draw_circle([moveto[0]-width*0.15, moveto[1]+height*(0.5-i*0.1)], 0.04*size, 0.1)
+  print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
+  # print('{} {} {} {} {} {} curveto'.format(moveto[0]+width, moveto[1]+height*1/3,
+  #                                          moveto[0]+width, moveto[1]+height*2/3,
+  #                                          moveto[0], moveto[1]+height))
+  print('{} {} {} {} {} arc closepath'.format(moveto[0], moveto[1], height/2, -90, 90))
+  print('gsave 1 setgray fill grestore 0 setgray 0.1 setlinewidth stroke')
+
+#_______________________________________________________________________________
+def draw_emulsion():
+  global scale
+  unit = 1e0
+  scale = 0.04*unit
+  width = 10*345*scale
+  #height = 10*350*scale
+  height = 40
+  thin_gel = 100*scale/unit
+  thin_base = 180*scale/unit
+  thick_gel = 480*scale/unit # designed to be 450
+  thick_base = 40*scale/unit
+  space = 0
+  zigzag = 2
+  x = 10
+  y = 40
+  lw = 0.4
+  fc = 0.9
+  ''' thin '''
+  draw_square([x, y], thin_gel, height, lw, fc)
+  draw_square([x+thin_gel, y], thin_base, height, lw)
+  draw_square([x+thin_gel+thin_base, y], thin_gel, height, lw, fc)
+  draw_line_with_scale([x, y+height], thin_gel, 5, True)
+  draw_line_with_scale([x+thin_gel, y+height], thin_base, 10)
+  draw_line_with_scale([x+thin_gel+thin_base, y+height], thin_gel, 5)
+  x = x + 2*thin_gel + thin_base + space
+  height -= zigzag
+  draw_square([x, y], thick_gel, height, lw, fc)
+  draw_square([x+thick_gel, y], thick_base, height, lw)
+  draw_square([x+thick_gel+thick_base, y], thick_gel, height, lw, fc)
+  height += zigzag
+  x = x + 2*thick_gel + thick_base + space
+  draw_square([x, y], thick_gel, height, lw, fc)
+  draw_square([x+thick_gel, y], thick_base, height, lw)
+  draw_square([x+thick_gel+thick_base, y], thick_gel, height, lw, fc)
+  draw_line_with_scale([x, y+height], thick_gel, 5)
+  draw_line_with_scale([x+thick_gel, y+height], thick_base, 15)
+  draw_line_with_scale([x+thick_gel+thick_base, y+height], thick_gel, 5)
+  x = x + 2*thick_gel + thick_base + space
+  x = x + (2*thick_gel + thick_base + space)/4
+  draw_text([x-0.5-space/2, y+height*0.625], '...', False, 12)
+  x = x + (2*thick_gel + thick_base + space)/4
+  height += zigzag
+  draw_square([x, y], thick_gel, height, lw, fc)
+  draw_square([x+thick_gel, y], thick_base, height, lw)
+  draw_square([x+thick_gel+thick_base, y], thick_gel, height, lw, fc)
+  height -= zigzag
+  x = x + 2*thick_gel + thick_base + space
+  draw_square([x, y], thin_gel, height, lw, fc)
+  draw_square([x+thin_gel, y], thin_base, height, lw)
+  draw_square([x+thin_gel+thin_base, y], thin_gel, height, lw, fc)
+  x = x + 2*thin_gel + thin_base
+  ''' crip '''
+  draw_square([9, y-1], x-8, height/4, 0, 1)
+  ''' scale '''
+  draw_line_with_scale([10, y+height+20], x-10, 5)
+  draw_text([10+thin_gel+thin_base/2, y+height/4-8], 'thin plate')
+  draw_text([(10+x)/2, y+height/4-8], '11 thick plates')
+  draw_text([x-thin_gel-thin_base/2, y+height/4-8], 'thin plate')
+  draw_text([x+15, y], '[um]')
+
+#_______________________________________________________________________________
+def draw_trigger():
+  dsize = 5
+  x = 10
+  y = a4size[1]-dsize*10
+  ypitch = dsize*3
+  l = 12
+  ''' BH1 '''
+  draw_text_box([x, y], 'BH1', dsize)
+  draw_arrow([x+3*dsize, y+dsize], l, 0, 3)
+  draw_text_box([x+l+3*dsize, y], 'MT', dsize)
+  draw_arrow([x+l+5*dsize, y+dsize], l, 0, 3)
+  draw_logic_or([x+2*l+(5+0.9)*dsize, y+(1-0.8*2.4)*dsize], dsize)
+  draw_arrow([x+2*l+(8.15)*dsize, y+(1-0.8*2.4+1.2)*dsize], l, 0, 3)
+  ''' BH2 '''
+  y = y - ypitch
+  draw_text_box([x, y], 'BH2', dsize)
+  draw_arrow([x+3*dsize, y+dsize], 3*l+5.15*dsize, 0, 3)
+  draw_text_box([x+l+3*dsize, y], 'MT', dsize)
+  draw_logic_and([x+3*l+8.15*dsize, y+dsize], ypitch-0.8*dsize)
+  draw_arrow([x+3*l+7.55*dsize+0.75*ypitch, y+0.6*dsize+0.5*ypitch], l, 0, 3)
+  draw_arrow([x+4*l+7.55*dsize+0.75*ypitch, y-0.5*ypitch+dsize], 0, ypitch-0.4*dsize, 3)
+  draw_arrow([x+4*l+7.55*dsize+0.75*ypitch, y-0.5*ypitch+dsize], l, 0, 3)
+  ''' BAC '''
+  y = y - ypitch
+  draw_text_box([x, y], 'BAC1', dsize)
+  draw_arrow([x+4*dsize, y+dsize], l, 0, 3)
+  draw_arrow([x+l+4*dsize, y+dsize], 0, -0.35*ypitch, 3)
+  draw_arrow([x+l+4*dsize, y+dsize-0.35*ypitch], l, 0, 3)
+  y = y - ypitch
+  draw_text_box([x, y], 'BAC2', dsize)
+  draw_arrow([x+4*dsize, y+dsize], l, 0, 3)
+  draw_arrow([x+l+4*dsize, y+dsize], 0, 0.35*ypitch, 3)
+  draw_arrow([x+l+4*dsize, y+dsize+0.35*ypitch], l, 0, 3)
+  draw_arrow([x+2*l+4.5*dsize, y+dsize+0.5*ypitch], 4*l+3.55*dsize, 0, 3)
+  #draw_logic_and([x+l+4*dsize, y+dsize], ypitch)
+  draw_logic_or([x+2*l+3.4*dsize, y+dsize+(ypitch-2.4*dsize)/2], dsize, False)
+  draw_circle([x+5*l+7.55*dsize+0.75*ypitch-1, y+dsize+0.5*ypitch], 1)
+  # K-beam
+  draw_logic_and([x+5*l+7.55*dsize+0.75*ypitch, y+dsize+0.5*ypitch], ypitch)
+  draw_text([x+5*l+7.55*dsize+1.125*ypitch, y+dsize+1.9*ypitch], 'K beam')
+  draw_arrow([x+5*l+7.55*dsize+1.5*ypitch, y+dsize+ypitch], 2*l, 0, 3)
+  draw_arrow([x+7*l+7.55*dsize+1.5*ypitch, y+dsize-ypitch], 0, 2*ypitch, 3)
+  draw_arrow([x+7*l+7.55*dsize+1.5*ypitch, y+dsize-ypitch], l, 0, 3)
+  ''' PVAC '''
+  y = y - ypitch
+  draw_text_box([x, y], 'PVAC', dsize)
+  draw_arrow([x+4*dsize, y+dsize], 5*l+3.55*dsize+0.75*ypitch, 0, 3)
+  ''' FAC '''
+  y = y - ypitch
+  draw_text_box([x, y], 'FAC', dsize)
+  draw_arrow([x+3*dsize, y+dsize], 3*l, 0, 3)
+  draw_arrow([x+3*l+3*dsize, y+dsize], 0, 0.5*ypitch, 3)
+  draw_arrow([x+3*l+3*dsize, y+dsize+0.5*ypitch], 2*l+4.55*dsize+0.75*ypitch, 0, 3)
+  draw_circle([x+5*l+7.55*dsize+0.75*ypitch-1, y+dsize+0.5*ypitch], 1)
+  # K scat
+  draw_text([x+5*l+7.55*dsize+1.125*ypitch, y+dsize+1.4*ypitch], 'K scat')
+  draw_logic_and([x+5*l+7.55*dsize+0.75*ypitch, y+dsize], ypitch)
+  ''' TOF '''
+  y = y - ypitch
+  draw_text_box([x, y], 'TOF', dsize)
+  draw_arrow([x+3*dsize, y+dsize], l, 0, 3)
+  draw_text_box([x+l+3*dsize, y], 'MT', dsize)
+  draw_arrow([x+l+5*dsize, y+dsize], l, 0, 3)
+  draw_logic_or([x+2*l+5.9*dsize, y-0.92*dsize], dsize)
+  draw_arrow([x+2*l+8.15*dsize, y+0.28*dsize], l, 0, 3)
+  draw_arrow([x+3*l+8.15*dsize, y+0.28*dsize], 0, 0.72*dsize+ypitch, 3)
+  draw_arrow([x+3*l+8.15*dsize, y+dsize+ypitch], 2*l-0.6*dsize+0.75*ypitch, 0, 3)
+  draw_circle([x+1.5*l+5*dsize, y+dsize], 1, 0.1)
+  draw_arrow([x+5*l+7.55*dsize+1.5*ypitch, y+dsize+1.5*ypitch], 3*l, 0, 3)
+  # KK
+  #draw_text([x+8*l+7.55*dsize+1.875*ypitch, y+dsize+2.4*ypitch], '(K, K)')
+  draw_logic_and([x+8*l+7.55*dsize+1.5*ypitch, y+dsize+ypitch], ypitch)
+  draw_arrow([x+8*l+7.55*dsize+2.25*ypitch, y+dsize+1.5*ypitch], 2*l, 0, 2)
+  #draw_text([x+9*l+7.55*dsize+2.25*ypitch, y+2.5*dsize+1.5*ypitch], '(K,K)')
+  draw_text([x+9*l+7.55*dsize+2.25*ypitch, y+1.5*dsize+1.5*ypitch], 'Trigger')
+  draw_text([x+9*l+7.55*dsize+2.25*ypitch, a4size[1]-dsize*10], 'MT: Mean timer')
+  y = y - ypitch
+  draw_arrow([x+1.5*l+5*dsize, y+dsize], 0, ypitch, 3)
+  draw_arrow([x+1.5*l+5*dsize, y+dsize], 3.5*l+2.55*dsize+0.75*ypitch, 0, 3)
+  for i in range(3):
+    draw_arrow([x+5*l+2.75*dsize+1.125*ypitch, y+dsize-i*0.24*dsize], 1.8*dsize, 0, 3)
+    draw_circle([x+5*l+3.65*dsize+1.125*ypitch, y+dsize-(i+3)*0.24*dsize], 0.04*dsize, 0.1)
+  ''' SCH '''
+  y = y - ypitch
+  draw_text_box([x, y], 'SCH', dsize)
+  draw_arrow([x+3*dsize, y+dsize], 5*l+4.55*dsize+0.75*ypitch, 0, 3)
+  for i in range(3):
+    draw_arrow([x+5*l+2.75*dsize+1.125*ypitch, y+dsize-i*0.24*dsize], 1.8*dsize, 0, 3)
+    draw_circle([x+5*l+3.65*dsize+1.125*ypitch, y+dsize-(i+3)*0.24*dsize], 0.04*dsize, 0.1)
+  ''' FBH '''
+  y = y - ypitch
+  draw_text_box([x, y], 'FBH', dsize)
+  draw_arrow([x+3*dsize, y+dsize], 5*l+4.55*dsize+0.75*ypitch, 0, 3)
+  for i in range(3):
+    draw_arrow([x+5*l+2.75*dsize+1.125*ypitch, y+dsize-i*0.24*dsize], 1.8*dsize, 0, 3)
+    draw_circle([x+5*l+3.65*dsize+1.125*ypitch, y+dsize-(i+3)*0.24*dsize], 0.04*dsize, 0.1)
+  ''' HUL Matrix '''
+  draw_text_box([x+5*l+4.55*dsize+1.125*ypitch, y-dsize], 'HUL Matrix', dsize)
+  #draw_text_box([x+5*l+7.55*dsize+0.75*ypitch, y-dsize], 'HUL Matrix', dsize)
+  draw_arrow([x+5*l+10.55*dsize+1.125*ypitch, y+0.5*dsize+ypitch], 2*l-3*dsize+0.375*ypitch, 0, 3)
+  draw_arrow([x+7*l+7.55*dsize+1.5*ypitch, y+0.5*dsize+ypitch], 0, 0.5*dsize+3*ypitch, 3)
+  draw_arrow([x+7*l+7.55*dsize+1.5*ypitch, y+dsize+4*ypitch], l, 0, 3)
+
+#_______________________________________________________________________________
+def draw_daq():
+  scale = 1.0
+  draw_tof = True
+  x = 10
+  ystart = a4size[1]-35
+  l = 30
+  w1 = 10*3/4
+  w2 = 10*2/4
+  w3 = 10*1/4
+  wctrl = 45
+  wdata = 30
+  wtag = 15
+  ypitch = 12
+  ctrig = 'red'
+  cbusy = 'green'
+  cdata = 'orange'
+  ctag = 'tag'
+  cctrl = 'cyan'
+  y = ystart - hdaq
+  draw_arrow([x, y], l, 0, 2)
+  draw_text([x+0.5*l, y+3], 'Spill gate')
+  y -= ypitch
+  draw_arrow([x, y], l, 0, 2)
+  draw_text([x+0.5*l, y+3], 'DAQ gate')
+  y -= ypitch
+  draw_arrow([x, y], l, 0, 2, ctrig)
+  draw_text([x+0.5*l, y+3], 'Trigger')
+  x += l
+  draw_square([x, y-0.5*ypitch], 0.75*l, 3*ypitch)
+  # draw_text([x+0.5*l, y+1.5*ypitch], 'Master')
+  # draw_text([x+0.5*l, y+1.*ypitch], 'Trigger')
+  # draw_text([x+0.5*l, y+0.5*ypitch], 'Module')
+  draw_text([x+0.375*l, y+1.5*ypitch], 'MTM')
+  draw_arrow([x+0.75*l, y+2*ypitch], a4size[0]-80-x-0.75*l, 0, 0, ctag)
+  draw_text([x+1.125*l, y+2*ypitch+2], 'Ethernet cable', False, 3)
+  draw_arrow([x+1.125*l, y+2*ypitch], -2, -5, 3, 0)
+  draw_arrow([x+1.125*l, y+2*ypitch], 2, -5, 3, 0)
+  draw_arrow([x+0.85*l, y+2*ypitch-5], 0.275*l-2, 0, 3)
+  draw_arrow([x+1.125*l+2, y+2*ypitch-5], 0.275*l-2, 0, 3)
+  draw_arrow([x+0.85*l, y+2*ypitch-15], 0.55*l, 0, 3)
+  draw_arrow([x+0.85*l, y+2*ypitch-15], 0, 10, 3)
+  draw_arrow([x+1.4*l, y+2*ypitch-15], 0, 10, 3)
+  draw_arrow([x+0.925*l, y+2*ypitch-8], 0.4*l, 0, 2, ctrig)
+  draw_arrow([x+0.925*l, y+2*ypitch-10], 0.4*l, 0, 2, 'blue')
+  draw_arrow([x+0.925*l, y+2*ypitch-12], 0.4*l, 0, 1, cbusy)
+  ''' subsystem '''
+  x = a4size[0] - 80
+  y = ystart - 3/4*hdaq
+  ''' vme01 '''
+  draw_text_box([x, y], 'XVB601')
+  y -= hdaq
+  draw_text_box([x, y], 'VME RM')
+  draw_arrow([x-w1, y+0.5*hdaq], w1, 0, 3, ctrig)
+  draw_arrow([x-w1, y+0.5*hdaq], 0, -11/6*hdaq, 3, ctrig)
+  draw_arrow([x-w2, y+0.25*hdaq], w2, 0, 2, cbusy)
+  draw_arrow([x-w2, y+0.25*hdaq], 0, -23/12*hdaq, 3, cbusy)
+  y -= hdaq
+  draw_text_box([x, y], 'QDC CAEN V792')
+  draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, ctrig)
+  draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
+  y -= hdaq
+  draw_text_box([x, y], 'HRTDC CAEN V775')
+  draw_square([x+wdaq, y], 10, 4*hdaq)
+  draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, ctrig)
+  draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
+  for i in range(3): draw_arrow([x+wdaq, y+(i+0.5)*hdaq], w1, 0, 3, cdata)
+  draw_arrow([x+wdaq+w1, y+0.5*hdaq], 0, 3*hdaq, 3, cdata)
+  draw_arrow([x+wdaq, y+3.5*hdaq], w1, 0, 1, cdata)
+  draw_arrow([x-wctrl, y+11/3*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+10/3*hdaq], wdata, 0, 3, cdata)
+  draw_text([x+wdaq+25, y+2*hdaq], 'VME bus', True)
+  ''' vme04 '''
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'XVB601')
+  y -= hdaq
+  draw_text_box([x, y], 'VME RM')
+  draw_arrow([x-wtag, y+3/4*hdaq], wtag, 0, 2, ctag)
+  draw_arrow([x-(4*w1 + wctrl if draw_tof else w1), y+2/4*hdaq],
+             (4*w1 + wctrl if draw_tof else w1), 0, 3, ctrig)
+  draw_arrow([x-(4*w1 + wctrl if draw_tof else w1), y+2/4*hdaq],
+             0, (-4/6*hdaq if draw_tof else -5/6*hdaq), 3, ctrig)
+  draw_arrow([x-w2, y+1/4*hdaq], w2, 0, 2, cbusy)
+  draw_arrow([x-w2, y+1/4*hdaq], 0, -11/12*hdaq, 3, cbusy)
+  y -= hdaq
+  draw_text_box([x, y], 'NOTICE TDC64M')
+  draw_arrow([x-(3*w1 + wctrl - 0.5*hdaq if draw_tof else w1), y+2/3*hdaq],
+             (3*w1 + wctrl - 0.5*hdaq if draw_tof else w1), 0, 2, ctrig)
+  if draw_tof:
+    draw_text([x-(7*w1 + wctrl), y+3/6*hdaq-1.8], 'TOF')
+    draw_arrow([x-(4*w1 + wctrl), y+5/6*hdaq], w1, 0, 3, ctrig)
+    draw_arrow([x-(6*w1 + wctrl), y+3/6*hdaq], 3*w1, 0, 3)
+    draw_logic_and([x-(3*w1 + wctrl), y+2/6*hdaq], hdaq/1.5)
+  draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
+  draw_square([x+wdaq, y], 10, 3*hdaq)
+  for i in range(2): draw_arrow([x+wdaq, y+(i+0.5)*hdaq], w1, 0, 3, cdata)
+  draw_arrow([x+wdaq+w1, y+0.5*hdaq], 0, 2*hdaq, 3, cdata)
+  draw_arrow([x-wctrl, y+8/3*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+7/3*hdaq], wdata, 0, 3, cdata)
+  draw_arrow([x+wdaq, y+5/2*hdaq], w1, 0, 1, cdata)
+  draw_text([x+wdaq+25, y+1.5*hdaq], 'VME bus', True)
+  ''' vme07 '''
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'XVB601')
+  y -= hdaq
+  draw_text_box([x, y], 'VME RM')
+  draw_arrow([x-wtag, y+3/4*hdaq], wtag, 0, 2, ctag)
+  draw_arrow([x-w1, y+2/4*hdaq], w1, 0, 3, ctrig)
+  draw_arrow([x-w1, y+2/4*hdaq], 0, -5/6*hdaq, 3, ctrig)
+  draw_arrow([x-w2, y+1/4*hdaq], w2, 0, 2, cbusy)
+  draw_arrow([x-w2, y+1/4*hdaq], 0, -11/12*hdaq, 3, cbusy)
+  y -= hdaq
+  draw_text_box([x, y], 'APVDAQ')
+  draw_square([x+wdaq, y], 10, 3*hdaq)
+  draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, ctrig)
+  draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
+  for i in range(2): draw_arrow([x+wdaq, y+(i+0.5)*hdaq], w1, 0, 3, cdata)
+  draw_arrow([x+wdaq+w1, y+0.5*hdaq], 0, 2*hdaq, 3, cdata)
+  draw_arrow([x+wdaq, y+5/2*hdaq], w1, 0, 1, cdata)
+  draw_arrow([x-wctrl, y+8/3*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+7/3*hdaq], wdata, 0, 3, cdata)
+  draw_text([x+wdaq+25, y+1.5*hdaq], 'VME bus', True)
+  ''' COPPER '''
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'Front-end PC')
+  y -= hdaq
+  draw_text_box([x, y], 'VME RM')
+  draw_arrow([x-wtag, y+2/4*hdaq], wtag, 0, 2, ctag)
+  y -= hdaq
+  draw_text_box([x, y], 'COPPER Lite')
+  draw_square([x+wdaq, y], 10, 2*hdaq)
+  draw_arrow([x+wdaq+w3, y+1/4*hdaq], 0, hdaq, 3, cbusy)
+  draw_arrow([x+wdaq, y+1/4*hdaq], w3, 0, 3, cbusy)
+  draw_arrow([x+wdaq, y+5/4*hdaq], w3, 0, 1, cbusy)
+  draw_arrow([x+wdaq, y+7/4*hdaq], w1, 0, 3, ctrig)
+  draw_arrow([x+wdaq, y+6/4*hdaq], w2, 0, 3, 'blue')
+  draw_arrow([x+wdaq, y+3/4*hdaq], w1, 0, 1, ctrig)
+  draw_arrow([x+wdaq, y+2/4*hdaq], w2, 0, 1, 'blue')
+  draw_arrow([x+wdaq+w1, y+3/4*hdaq], 0, hdaq, 3, ctrig)
+  draw_arrow([x+wdaq+w2, y+2/4*hdaq], 0, hdaq, 3, 'blue')
+  draw_arrow([x-wctrl, y+14/5*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+13/5*hdaq], wdata, 0, 3, cdata)
+  draw_arrow([x-w1, y+12/5*hdaq], w1, 0, 3, cctrl)
+  draw_arrow([x-w1, y+12/5*hdaq], 0, -26/15*hdaq, 3, cctrl)
+  draw_arrow([x-w2, y+11/5*hdaq], w2, 0, 2, cdata)
+  draw_arrow([x-w2, y+11/5*hdaq], 0, -28/15*hdaq, 3, cdata)
+  draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, cctrl)
+  draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cdata)
+  draw_text([x+wdaq+21.7, y+1*hdaq], 'J0 bus', True)
+  ''' EASIROC '''
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'Front-end PC')
+  y -= hdaq
+  draw_text_box([x, y], 'EASIROC')
+  draw_arrow([x-wctrl, y+9/5*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+8/5*hdaq], wdata, 0, 3, cdata)
+  draw_arrow([x-w1, y+7/5*hdaq], w1, 0, 3, cctrl)
+  draw_arrow([x-w2, y+6/5*hdaq], w2, 0, 2, cdata)
+  draw_arrow([x-w1, y+7/5*hdaq], 0, -9/15*hdaq, 3, cctrl)
+  draw_arrow([x-w2, y+6/5*hdaq], 0, -9/15*hdaq, 3, cdata)
+  draw_arrow([x-w1, y+4/5*hdaq], w1, 0, 2, cctrl)
+  draw_arrow([x-w2, y+3/5*hdaq], w2, 0, 3, cdata)
+  draw_arrow([x-w1, y+2/5*hdaq], w1, 0, 2, ctrig)
+  draw_arrow([x-w2, y+1/5*hdaq], w2, 0, 3, cbusy)
+  ''' EM '''
+  # y -= 1.5*hdaq
+  # draw_text_box([x, y], 'BIT3')
+  # y -= hdaq
+  # draw_text_box([x, y], 'VME RM')
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'EM controller PC')
+  draw_arrow([x-wctrl, y+3/4*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+1/2*hdaq], wdata, 0, 3, cdata)
+  ''' HUL MATRIX '''
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'SBS BIT3 618')
+  y -= hdaq
+  draw_text_box([x, y], 'VME RM')
+  draw_square([x+wdaq, y], 10, 2*hdaq)
+  draw_arrow([x-wtag, y+3/4*hdaq], wtag, 0, 2, ctag)
+  draw_arrow([x-w1, y+2/4*hdaq], w1, 0, 3, ctrig)
+  draw_arrow([x-w1, y+2/4*hdaq], 0, 39/10*hdaq, 3, ctrig)
+  draw_arrow([x-w1, y+2/4*hdaq], 0, -5/6*hdaq, 3, ctrig)
+  draw_arrow([x-w2, y+1/4*hdaq], w2, 0, 2, cbusy)
+  draw_arrow([x-w2, y+1/4*hdaq], 0, 79/20*hdaq, 3, cbusy)
+  draw_arrow([x-w2, y+1/4*hdaq], 0, -11/12*hdaq, 3, cbusy)
+  draw_arrow([x+wdaq+w1, y+0.5*hdaq], 0, hdaq, 3, cdata)
+  draw_arrow([x+wdaq, y+1/2*hdaq], w1, 0, 3, cdata)
+  draw_arrow([x+wdaq, y+3/2*hdaq], w1, 0, 1, cdata)
+  draw_arrow([x-w3, y+3/2*hdaq], w3, 0, 3, cdata)
+  draw_arrow([x-w3, y+3/2*hdaq], 0, 5/4*hdaq, 3, cdata)
+  draw_arrow([x-w3, y+11/4*hdaq], w3, 0, 2, cdata)
+  draw_text([x+wdaq+25, y+hdaq], 'VME bus', True)
+  y -= hdaq
+  draw_text_box([x, y], 'HUL MATRIX')
+  draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, ctrig)
+  draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
+  ''' HUL SCALER '''
+  y -= 1.5*hdaq
+  draw_text_box([x, y], 'Front-end PC')
+  draw_arrow([x-wctrl, y+4/5*hdaq], wctrl, 0, 2, cctrl)
+  draw_arrow([x-wdata, y+3/5*hdaq], wdata, 0, 3, cdata)
+  draw_arrow([x-w1, y+2/5*hdaq], w1, 0, 3, cctrl)
+  draw_arrow([x-w2, y+1/5*hdaq], w2, 0, 2, cdata)
+  y -= hdaq
+  draw_text_box([x, y], 'HUL SCALER')
+  draw_arrow([x-wtag, y+3/4*hdaq], wtag, 0, 2, ctag)
+  draw_arrow([x-w1, y+2/4*hdaq], w1, 0, 2, cctrl)
+  draw_arrow([x-w2, y+1/4*hdaq], w2, 0, 3, cdata)
+  draw_arrow([x-w1, y+2/4*hdaq], 0, 18/20*hdaq, 3, cctrl)
+  draw_arrow([x-w2, y+1/4*hdaq], 0, 19/20*hdaq, 3, cdata)
+  draw_arrow([x-wtag, y+3/4*hdaq], 0, ystart-y-7/4*hdaq, 3, ctag)
+  draw_arrow([x-wctrl, y+9/5*hdaq], 0, 671/30*hdaq, 3, cctrl)
+  draw_arrow([x-wdata, y+8/5*hdaq], 0, 667/30*hdaq, 3, cdata)
+  ''' EB '''
+  x = 15
+  y = ystart - 8*ypitch if draw_tof else ystart - 7*ypitch
+  draw_text([x+0.5*wdaq, y+3], 'Main DAQ computer')
+  for i, name in enumerate(['Controller', 'Event builder', 'Event distributer', 'Recorder']):
+    draw_text_box([x, y-(i+1)*hdaq], name)
+    draw_arrow([x+wdaq, y-(i+(1/2 if i == 0 else 1/4 if i == 1 else 1/3))*hdaq],
+               (a4size[0] - 80 - x - wdaq - wctrl if i == 0 else w1), 0,
+               3 if i == 0 else 1, cctrl)
+    draw_arrow([x+wdaq, y-(i+(1/2 if i == 1 else 2/3))*hdaq],
+               (0 if i == 0 else a4size[0] - 80 - x - wdaq - wdata
+                if i == 1 else w2), 0, 3 if i == 0 else 1, cdata)
+  draw_arrow([x+wdaq, y-7/4*hdaq], w2, 0, 3, cdata)
+  draw_arrow([x+wdaq+w2, y-11/3*hdaq], 0, 23/12*hdaq, 3, cdata)
+  draw_arrow([x+wdaq+w1, y-10/3*hdaq], 0, 34/12*hdaq, 3, cctrl)
+  draw_text_box([x, y-7*hdaq], 'Online monitor')
+  draw_arrow([x+wdaq, y-6.5*hdaq], w2, 0, 1, cdata)
+  draw_arrow([x+wdaq+w2, y-11/3*hdaq], 0, -17/6*hdaq, 3, cdata)
+  ''' Legend '''
+  x = 15
+  y = 55
+  ypitch = 8
+  draw_arrow([x, y], l, 0, 2, ctrig)
+  draw_text([x+0.5*l, y+2], 'Trigger', False, 4)
+  y -= ypitch
+  draw_arrow([x, y], l, 0, 2, 'blue')
+  draw_text([x+0.5*l, y+2], 'Event tag', False, 4)
+  y -= ypitch
+  draw_arrow([x, y], l, 0, 2, cbusy)
+  draw_text([x+0.5*l, y+2], 'Busy', False, 4)
+  y -= ypitch
+  draw_arrow([x, y], l, 0, 2, cdata)
+  draw_text([x+0.5*l, y+2], 'Data transfer', False, 4)
+  y -= ypitch
+  draw_arrow([x, y], l, 0, 2, cctrl)
+  draw_text([x+0.5*l, y+2], 'Slow control', False, 4)
+
+#_______________________________________________________________________________
+def draw_matrix():
+  pass
 
 #_______________________________________________________________________________
 if __name__ == '__main__':

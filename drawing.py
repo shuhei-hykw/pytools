@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 '''
-Script for making PostScript of detector drawing.
+Script for making PostScript of drawing.
 
  e.g. $ drawing.py bh1 > bh1.ps
 
-Supported detectors are as follows.
+Supported targets are as follows.
  - BH1
  - BAC
  - Collimator
@@ -17,6 +17,7 @@ Supported detectors are as follows.
  - TRIGGER
  - MATRIX
  - DAQ
+ - SU3
 '''
 
 import argparse
@@ -26,19 +27,26 @@ import os
 import sys
 
 #_______________________________________________________________________________
-a4size = [210, 297]
+supported = ['BH1', 'BAC', 'COLLIMATOR', 'FBH', 'SCH', 'TOF', 'EMULSION',
+             'TRIGGER', 'MATRIX', 'DAQ', 'SU3']
+
+#_______________________________________________________________________________
+a4size = [210.0, 297.0]
 scale = 1
-detector_name = ''
+target_name = ''
 default_text_size = 5
 no_view_label = True
+with_wave = False
 wdaq = 50
 hdaq = 10
+wmtx = 35
+hmtx = 15
 
 #_______________________________________________________________________________
 def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0): # mark = 0:both 1:first 2:last 3:none
   ''' draw arrow '''
   if width == 0 and height == 0: return
-  if detector_name == 'DAQ': msize = 1.5
+  if target_name == 'DAQ': msize = 1.5
   print('0 setgray')
   if color == 'red': print('0.9 0 0 setrgbcolor')
   elif color == 'green': print('0 0.8 0 setrgbcolor')
@@ -87,33 +95,177 @@ def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0):
     print('closepath gsave fill grestore {} setlinewidth stroke'.format(lw))
 
 #_______________________________________________________________________________
+def draw_elip(moveto, r, ratio, theta=0, fill_color=1.0, line_width=0.1):
+  print('/cmtx matrix currentmatrix def')
+  print('gsave {} {} translate {} rotate {} setlinewidth'
+        .format(moveto[0], moveto[1], theta, line_width))
+  print('newpath 1.0 {} scale 0 0 {} 0 360 arc'.format(ratio, r))
+  print('cmtx setmatrix closepath stroke grestore')
+
+#_______________________________________________________________________________
 def draw_circle(moveto, r, fill_color=1.0, a=0, b=360, line_width=0.1):
   ''' draw circle '''
   print('newpath {} {} moveto'.format(moveto[0]+r, moveto[1]))
   print('{} {} {} {} {} arc closepath'.format(moveto[0], moveto[1], r, a, b))
-  if fill_color > 0:
+  if fill_color >= 0:
     print('{} setgray gsave fill grestore'.format(fill_color))
   print('0.0 setgray')
   if line_width > 0:
     print('{} setlinewidth stroke'.format(line_width))
 
 #_______________________________________________________________________________
-def draw_detector():
-  ''' draw detector '''
+def draw_su3():
+  import ROOT
+  ROOT.gROOT.SetBatch()
+  c1 = ROOT.TCanvas('c1', 'c1', int(a4size[0])*10, int(a4size[1])*10)
+  t1 = ROOT.TLatex()
+  t1.SetTextFont(132)
+  t1.SetTextSize(0.02)
+  l1 = ROOT.TLine()
+  xstart = 0.1
+  ystart = 0.9
+  l = 0.02*math.sqrt(3)
+  xspace = 0.05
+  ''' 27s '''
+  x = xstart
+  y = ystart
+  t1.SetTextAlign(22)
+  t1.DrawLatexNDC(x, y, '27s')
+  ty = math.sqrt(3)/2*l * a4size[0]/a4size[1]
+  tx = 1/2*l
+  for i in range(4):
+    l1.DrawLineNDC(x+xspace+i*l, y, x+xspace+i*l+l, y)
+    l1.DrawLineNDC(x+xspace+i*l, y, x+xspace+i*l+tx, y+ty)
+    l1.DrawLineNDC(x+xspace+i*l, y, x+xspace+i*l+tx, y-ty)
+    l1.DrawLineNDC(x+xspace+i*l+l, y, x+xspace+i*l+l-tx, y+ty)
+    l1.DrawLineNDC(x+xspace+i*l+l, y, x+xspace+i*l+l-tx, y-ty)
+  for j in range(2):
+    sign = 2*(j%2-0.5)
+    l1.DrawLineNDC(x+xspace+2*tx, y+2*sign*ty, x+xspace+2*tx+2*l, y+2*sign*ty)
+    for i in range(3):
+      l1.DrawLineNDC(x+xspace+i*l+tx, y+sign*ty, x+xspace+i*l+tx+l, y+sign*ty)
+      l1.DrawLineNDC(x+xspace+i*l+tx, y+sign*ty, x+xspace+i*l+2*tx, y+2*sign*ty)
+      l1.DrawLineNDC(x+xspace+(i+1)*l+tx, y+sign*ty, x+xspace+(i+1)*l, y+2*sign*ty)
+  t1.SetTextAlign(12)
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+2*ty, 'S=0')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+2*ty, 'NN(T=1)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+ty, 'S=-1')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+ty, '#SigmaN(T=3/2), #SigmaN-#LambdaN(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y, 'S=-2')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y, '#Sigma#Sigma(T=2), #XiN-#Sigma#Lambda-#Lambda#Lambda(T=1), #XiN-#Sigma#Sigma-#Lambda#Lambda(T=0)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-ty, 'S=-3')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-ty, '#Xi#Sigma(T=3/2), #Xi#Sigma-#Xi#Lambda(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-2*ty, 'S=-4')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-2*ty, '#Xi#Xi(T=1)')
+  ''' 10a '''
+  y -= 5.5*ty
+  t1.SetTextAlign(22)
+  t1.DrawLatexNDC(x, y, '#bar{10a}')
+  for i in range(3):
+    yj = y + (0.5-i)*ty
+    for j in range(i+1):
+      xj = x + xspace + j*l + (3-i)*tx
+      l1.DrawLineNDC(xj, yj, xj+l, yj)
+      l1.DrawLineNDC(xj, yj, xj+tx, yj+ty)
+      l1.DrawLineNDC(xj+l, yj, xj+l-tx, yj+ty)
+  t1.SetTextAlign(12)
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+1.5*ty, 'S=0')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+1.5*ty, 'NN(T=0)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+0.5*ty, 'S=-1')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+0.5*ty, '#SigmaN-#LambdaN(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-0.5*ty, 'S=-2')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-0.5*ty, '#XiN-#Sigma#Lambda(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-1.5*ty, 'S=-3')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-1.5*ty, '#Xi#Sigma(T=3/2)')
+  ''' 10a '''
+  y -= 5*ty
+  t1.SetTextAlign(22)
+  t1.DrawLatexNDC(x, y, '10a')
+  for i in range(3):
+    yj = y - (1.5-i)*ty
+    for j in range(i+1):
+      xj = x + xspace + j*l + (3-i)*tx
+      l1.DrawLineNDC(xj, yj+ty, xj+l, yj+ty)
+      l1.DrawLineNDC(xj, yj+ty, xj+tx, yj)
+      l1.DrawLineNDC(xj+l, yj+ty, xj+l-tx, yj)
+  t1.SetTextAlign(12)
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+1.5*ty, 'S=-1')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+1.5*ty, '#SigmaN(T=3/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+0.5*ty, 'S=-2')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+0.5*ty, '#XiN-#Sigma#Lambda-#Sigma#Sigma(T=1)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-0.5*ty, 'S=-3')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-0.5*ty, '#Xi#Sigma-#Xi#Lambda(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-1.5*ty, 'S=-4')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-1.5*ty, '#Xi#Xi(T=0)')
+  ''' 8s '''
+  y -= 4.5*ty
+  t1.SetTextAlign(22)
+  t1.DrawLatexNDC(x, y, '8s')
+  for i in range(2):
+    xj = x+xspace+i*l + 2*tx
+    l1.DrawLineNDC(xj, y, xj+l, y)
+    for j in range(2):
+      sign = 2*(j%2-0.5)
+      l1.DrawLineNDC(xj, y, xj+tx, y+sign*ty)
+      l1.DrawLineNDC(xj+2*tx, y, xj+tx, y+sign*ty)
+      l1.DrawLineNDC(xj+tx, y+sign*ty, xj+(3-i*3)*tx, y+sign*ty)
+  t1.SetTextAlign(12)
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+ty, 'S=-1')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+ty, '#SigmaN-#LambdaN(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y, 'S=-2')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y, '#XiN-#Sigma#Lambda(T=1), #XiN-#Sigma#Sigma-#Lambda#Lambda(T=0)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-ty, 'S=-3')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-ty, '#Xi#Sigma-#Xi#Lambda(T=1/2)')
+  ''' 8a '''
+  y -= 4*ty
+  t1.SetTextAlign(22)
+  t1.DrawLatexNDC(x, y, '8a')
+  for i in range(2):
+    xj = x+xspace+i*l + 2*tx
+    l1.DrawLineNDC(xj, y, xj+l, y)
+    for j in range(2):
+      sign = 2*(j%2-0.5)
+      l1.DrawLineNDC(xj, y, xj+tx, y+sign*ty)
+      l1.DrawLineNDC(xj+2*tx, y, xj+tx, y+sign*ty)
+      l1.DrawLineNDC(xj+tx, y+sign*ty, xj+(3-i*3)*tx, y+sign*ty)
+  t1.SetTextAlign(12)
+  t1.DrawLatexNDC(x+2*xspace+4*l, y+ty, 'S=-1')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y+ty, '#SigmaN-#LambdaN(T=1/2)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y, 'S=-2')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y, '#XiN-#Sigma#Lambda-#Sigma#Sigma(T=1), #XiN(T=0)')
+  t1.DrawLatexNDC(x+2*xspace+4*l, y-ty, 'S=-3')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y-ty, '#Xi#Sigma-#Xi#Lambda(T=1/2)')
+  ''' 1s '''
+  y -= 3*ty
+  t1.SetTextAlign(22)
+  t1.DrawLatexNDC(x, y, '1s')
+  m1 = ROOT.TMarker(x+xspace+2*l, y, 8)
+  m1.SetMarkerSize(2)
+  m1.Draw()
+  #t1.DrawLatexNDC(x+xspace+2*l, y-0.002, '#bullet')
+  t1.SetTextAlign(12)
+  t1.DrawLatexNDC(x+2*xspace+4*l, y, 'S=-2')
+  t1.DrawLatexNDC(x+3*xspace+4*l, y, '#XiN-#Sigma#Sigma-#Lambda#Lambda(T=0)')
+
+  c1.Print('su3.ps')
+
+#_______________________________________________________________________________
+def draw_target():
+  ''' draw target '''
   global scale
   line_width = 0.4
   ''' EMULSION '''
-  if 'EMULSION' in detector_name:
+  if 'EMULSION' in target_name:
     return draw_emulsion()
   ''' TRIGGER '''
-  if 'TRIG' in detector_name:
+  if 'TRIG' in target_name:
     return draw_trigger()
-  if 'MATRIX' in detector_name:
+  if 'MATRIX' in target_name:
     return draw_matrix()
-  if 'DAQ' in detector_name:
+  if 'DAQ' in target_name:
     return draw_daq()
   ''' BFT '''
-  if detector_name == 'BFT':
+  if target_name == 'BFT':
     scale = 12.0
     phi = 1.0*scale
     d = phi*math.sqrt(3)/2
@@ -130,7 +282,7 @@ def draw_detector():
     draw_line_with_scale([xcenter-phi*(n+1)/4, ycenter-phi/2], phi, -10)
     return
   ''' BH1 '''
-  if detector_name == 'BH1':
+  if target_name == 'BH1':
     scale = 0.5
     t = 5*scale
     widths = [30, 20, 16, 12, 8, 8, 8, 12, 16, 20, 30]
@@ -158,7 +310,7 @@ def draw_detector():
     light_guide_position = [-22, 15]
     sci_position = [-25, 2]
   ''' BH2 '''
-  if detector_name == 'BH2':
+  if target_name == 'BH2':
     scale = 0.25
     t = 6*scale
     widths = [120*scale]
@@ -185,7 +337,7 @@ def draw_detector():
     light_guide_position = [-22, 5]
     sci_position = [-27, 2]
   ''' BAC '''
-  if detector_name == 'BAC':
+  if target_name == 'BAC':
     scale = 0.5
     xoffset = -40
     width = 160*scale
@@ -234,7 +386,7 @@ def draw_detector():
     # print('(PMT) dup stringwidth pop 2 div 0 exch sub 0 rmoveto show')
     return
   ''' Collimator '''
-  if detector_name == 'Collimator':
+  if target_name == 'Collimator':
     scale = 0.2
     t = 400*scale
     t_tan = 200*scale
@@ -292,7 +444,7 @@ def draw_detector():
     draw_text([xoffset+width/2, 260], 'Cross-sectional top view', False, 6)
     return
   ''' FBH '''
-  if detector_name == 'FBH':
+  if target_name == 'FBH':
     scale = 1.2
     t = 2*scale
     phi = 1*scale
@@ -319,7 +471,7 @@ def draw_detector():
     light_guide_position = [-len(widths)*pmt[0]/2-18, height/2+light_guide[1]/2]
     sci_position = [-sum(widths)/2+2*scale, 4]
   '''sch'''
-  if detector_name == 'SCH':
+  if target_name == 'SCH':
     scale = 1.7
     t = 2*scale
     widths = [11.5*scale for i in range(8)]
@@ -335,7 +487,7 @@ def draw_detector():
     upstream_position = 20
     downstream_position = 25
   ''' TOF '''
-  if detector_name == 'TOF':
+  if target_name == 'TOF':
     scale = 0.08
     t = 30*scale
     widths = [80*scale for i in range(24)]
@@ -361,7 +513,7 @@ def draw_detector():
     light_guide_position = [-92, 140]
     sci_position = [-93, 2]
   ''' BC3,4 '''
-  if 'BC' in detector_name:
+  if 'BC' in target_name:
     scale = 12.0
     wire_spacing = [3*scale, 4*scale] # anode-anode, anode-cathode
     width = wire_spacing[0]*3.5
@@ -377,8 +529,10 @@ def draw_detector():
                       0.1 if i == 1 else 1.0)
     draw_text([xcenter-width/2, ycenter+1.5*wire_spacing[1]-6.5], 'Anode')
     draw_text([xcenter-width/2, ycenter+1.5*wire_spacing[1]-13], 'wire')
-    draw_text([xcenter-width/2+wire_spacing[0]/2, ycenter+1.5*wire_spacing[1]-6.5], 'Potential')
-    draw_text([xcenter-width/2+wire_spacing[0]/2, ycenter+1.5*wire_spacing[1]-13], 'wire')
+    draw_text([xcenter-width/2, ycenter+0.5*wire_spacing[1]-6.5], 'Potential')
+    draw_text([xcenter-width/2, ycenter+0.5*wire_spacing[1]-13], 'wire')
+    # draw_text([xcenter-width/2+wire_spacing[0]/2, ycenter+1.5*wire_spacing[1]-6.5], 'Potential')
+    # draw_text([xcenter-width/2+wire_spacing[0]/2, ycenter+1.5*wire_spacing[1]-13], 'wire')
     draw_text([xcenter-width/2+15, ycenter+2*wire_spacing[1]+1.5], 'Cathode plane')
     #draw_text([xcenter-wire_spacing[0]/4+20, ycenter-wire_spacing[1]/4], 'Charged particle')
     draw_text([xcenter+wire_spacing[0]/4+20, ycenter+wire_spacing[1]*2.25], 'Charged particle')
@@ -389,12 +543,14 @@ def draw_detector():
                          -6, wire_spacing[1]/2, True)
     draw_arrow([xcenter+wire_spacing[0]/4*0.4, ycenter+1.5*wire_spacing[1]], wire_spacing[0]/4*0.6-1, 0)
     draw_arrow([xcenter-wire_spacing[0]/4+1, ycenter+0.5*wire_spacing[1]], wire_spacing[0]/4*0.6-1, 0)
-    draw_text([xcenter+wire_spacing[0]/4+7.5, ycenter+1.5*wire_spacing[1]-6.5], 'Drift length')
-    draw_text([xcenter-wire_spacing[0]/4-7.5, ycenter+0.5*wire_spacing[1]+5.], 'Drift length')
+    draw_text([xcenter+wire_spacing[0]/4+1.5, ycenter+1.5*wire_spacing[1]-6.5], 'Drift')
+    draw_text([xcenter+wire_spacing[0]/4+1.5, ycenter+1.5*wire_spacing[1]-13], 'length')
+    draw_text([xcenter-wire_spacing[0]/4-1.5, ycenter+0.5*wire_spacing[1]+11.5], 'Drift')
+    draw_text([xcenter-wire_spacing[0]/4-1.5, ycenter+0.5*wire_spacing[1]+5.], 'length')
     draw_text([xcenter+width/2, ycenter-wire_spacing[1]/4], '[mm]')
     return
   ''' SDC1 '''
-  if detector_name == 'SDC1':
+  if target_name == 'SDC1':
     scale = 4.0
     wire_spacing = 6*scale # anode-anode and field-field
     r = 2*math.sqrt(3)*scale
@@ -418,19 +574,21 @@ def draw_detector():
                normal_vector[0], normal_vector[1])
     draw_arrow([xcenter+1+0.01*scale, ycenter+r-0.01*scale],
                normal_vector[0], normal_vector[1])
-    draw_text([xcenter+r+5, ycenter+2.5*r+2.5], 'Drift length', False, 4)
-    draw_text([xcenter-5, ycenter+r+2.5], 'Drift length', False, 4)
+    draw_text([xcenter+r, ycenter+2.5*r+7.5], 'Drift', False, 4)
+    draw_text([xcenter+r, ycenter+2.5*r+3.5], 'length', False, 4)
+    draw_text([xcenter-0.5, ycenter+r+7.5], 'Drift', False, 4)
+    draw_text([xcenter-0.5, ycenter+r+3.5], 'length', False, 4)
     draw_text([xcenter+width/2+r*2, ycenter-wire_spacing/2], '[mm]')
     return
   n = len(widths)
   total_width = sum(widths) - overlap*(n-1)
-  has_pmt = (True if detector_name == 'BH1' or detector_name == 'BH2'
-             or detector_name == 'TOF' else False)
+  has_pmt = (True if target_name == 'BH1' or target_name == 'BH2'
+             or target_name == 'TOF' else False)
   mizo = (pmt[0]-light_guide[0])/2 #if has_pmt else 0
   '''front view'''
-  ycenter = (a4size[1] - pmt[1]*2 - light_guide[1]*2 if detector_name == 'BH1' else
-             a4size[1] - pmt[1]*3 - light_guide[1]*2 if detector_name == 'BH2' else
-             a4size[1]/2 - height/2 - 34*scale if detector_name == 'FBH' else
+  ycenter = (a4size[1] - pmt[1]*2 - light_guide[1]*2 if target_name == 'BH1' else
+             a4size[1] - pmt[1]*3 - light_guide[1]*2 if target_name == 'BH2' else
+             a4size[1]/2 - height/2 - 34*scale if target_name == 'FBH' else
              a4size[1]/2 - height/2)
   if not no_view_label:
     draw_text([a4size[0]/2+view_position, ycenter+height/2+front_view_offset], 'Front view', False, 6)
@@ -442,24 +600,24 @@ def draw_detector():
     even_odd = [i*2+1 for i in range(int(n/2)+1 if n%2 == 1 else int(n/2))]
     even_odd += [i*2 for i in range(int(n/2))]
   for i, seg in enumerate(even_odd):
-    if detector_name == 'TOF':
+    if target_name == 'TOF':
       if i == n/2: draw_text([a4size[0]/2, ycenter+height/2], '...', False, 10)
       if abs(seg -n/2+0.5) < 2: continue
     x = (a4size[0] - total_width)/2 + sum(widths[:seg-n]) - seg*overlap
     draw_square([x, ycenter], widths[seg], height, line_width,
                 ((seg%2+1 if n%2 == 1 else 2-seg%2)*0.8))
-    if detector_name == 'TOF' or detector_name == 'FBH':
+    if target_name == 'TOF' or target_name == 'FBH':
       x += (widths[seg] - pmt[0])/2
-      if detector_name == 'FBH': x = a4size[0]/2+(-n/2+seg)*pmt[0]
+      if target_name == 'FBH': x = a4size[0]/2+(-n/2+seg)*pmt[0]
       y = ycenter-pmt[1]-light_guide[1]
       xsci = (a4size[0] - total_width)/2 + sum(widths[:seg-n]) - seg*overlap
-      if detector_name == 'FBH': xsci += (widths[seg] - phi)/2
+      if target_name == 'FBH': xsci += (widths[seg] - phi)/2
       draw_polygon([x+mizo+light_guide[0], y+pmt[1]+light_guide[2]],
                    [[0, -light_guide[2]],
                     [-light_guide[0], 0],
                     [0, light_guide[2]],
                     [xsci-x-mizo, light_guide[1]-light_guide[2]],
-                    [widths[seg] if detector_name == 'TOF' else phi, 0]], 0.3, 1.0)
+                    [widths[seg] if target_name == 'TOF' else phi, 0]], 0.3, 1.0)
       y = ycenter+height+light_guide[1]
       draw_square([x, y], pmt[0], pmt[1], 0.3)
       draw_polygon([x+mizo+light_guide[0], y-light_guide[2]],
@@ -467,17 +625,17 @@ def draw_detector():
                     [-light_guide[0], 0],
                     [0, -light_guide[2]],
                     [xsci-x-mizo, -light_guide[1]+light_guide[2]],
-                    [widths[seg] if detector_name == 'TOF' else phi, 0],
+                    [widths[seg] if target_name == 'TOF' else phi, 0],
                    ], 0.3, 1.0)
       draw_arrow([x+mizo, y-light_guide[2]], light_guide[0], 0, 3)
-  if detector_name == 'FBH':
+  if target_name == 'FBH':
     draw_square([(a4size[0]-total_width)/2, y], total_width, pmt[1], 0.3, 0.4)
     draw_square([(a4size[0]-n*pmt[0])/2, y+pmt[1]], n*pmt[0], pmt[1], 0.3)
     draw_text([(a4size[0]-total_width)/2-22, y], 'Fiber fixing frame')
     draw_arrow([(a4size[0]-total_width)/2-2, y+pmt[1]/2], 4, 0, 3)
   for i, seg in enumerate(light_guide_seg):
     j = i
-    if detector_name == 'BH1':
+    if target_name == 'BH1':
       if i == len(light_guide_seg) - 2:
         j = i + 1
       if i == len(light_guide_seg) - 1:
@@ -502,11 +660,11 @@ def draw_detector():
                  ], 0.3, 1.0)
   draw_square([(a4size[0]-total_width)/2, ycenter-light_guide[1]-1], total_width,
               light_guide[1]*0.5, 0)
-  for i in range(1 if detector_name == 'BH1' or detector_name == 'BH2' else 0):
+  for i in range(1 if target_name == 'BH1' or target_name == 'BH2' else 0):
     y = ycenter-light_guide[1]+(2*i-1)*light_guide[2]+(1-i)*(height+light_guide[1]*2)
     draw_arrow([a4size[0]/2+(-len(light_guide_seg)/2)*pmt[0]+mizo, y],
                light_guide[0], 0, 3)
-    if detector_name == 'BH1':
+    if target_name == 'BH1':
       draw_arrow([a4size[0]/2+(-len(light_guide_seg)/2+1)*pmt[0]+mizo, y],
                  pmt[0]*(len(light_guide_seg)-2) - mizo*2, 0, 3)
       draw_arrow([a4size[0]/2+(len(light_guide_seg)/2-1)*pmt[0]+mizo, y],
@@ -516,30 +674,32 @@ def draw_detector():
              ycenter+height+light_guide[1]+pmt[1]+pmt_position[1]],
             pmt_name)
   draw_arrow([a4size[0]/2-len(light_guide_seg)/2*pmt[0]+pmt_position[0] +
-              (21 if detector_name == 'FBH' else 13 if detector_name == 'TOF' else
-               19 if detector_name == 'BH1' else 14.5),
+              (21 if target_name == 'FBH' else 13 if target_name == 'TOF' else
+               19 if target_name == 'BH1' else 14.5),
               ycenter+height+light_guide[1]+pmt[1]+pmt_position[1]], 4, -2, 3)
   draw_text([a4size[0]/2-len(light_guide_seg)/2*pmt[0]+light_guide_position[0],
              ycenter+light_guide[1]+light_guide_position[1]],
             'Acrylic light guide' if has_pmt else 'WLS fiber')
   draw_arrow([a4size[0]/2-len(light_guide_seg)/2*pmt[0]+light_guide_position[0] +
-              (11.5 if detector_name == 'FBH' else 19),
+              (11.5 if target_name == 'FBH' else 19),
               ycenter+light_guide[1]+light_guide_position[1]], 4, -2, 3)
   draw_text([a4size[0]/2-len(light_guide_seg)/2*pmt[0]+sci_position[0],
              ycenter+height+sci_position[1]], sci_name)
   draw_arrow([a4size[0]/2-len(light_guide_seg)/2*pmt[0]+sci_position[0]+19,
               ycenter+height+sci_position[1]], 4, -8, 3)
-  nwave = int(total_width/5)
-  for i in range(nwave):
-    for j in range(2):
-      draw_wave([(a4size[0]-total_width)/2+total_width/nwave*i,
-                 (ycenter-light_guide[1]*0.7+j*1 if detector_name == 'BH2' else
-                  ycenter-light_guide[1]*0.6+j*1 if detector_name == 'BH1' else
-                  ycenter-light_guide[1]*0.8+j*1 if detector_name == 'TOF' else
-                  ycenter-light_guide[1]*0.7+j*1 )],
-                total_width/nwave, 3*(i%2-0.5))
+  if with_wave:
+    wwave = 10
+    nwave = int(total_width/wwave)
+    for i in range(nwave):
+      for j in range(2):
+        draw_wave([(a4size[0]-total_width)/2+total_width/nwave*i,
+                   (ycenter-light_guide[1]*0.7+j*1 if target_name == 'BH2' else
+                    ycenter-light_guide[1]*0.6+j*1 if target_name == 'BH1' else
+                    ycenter-light_guide[1]*0.8+j*1 if target_name == 'TOF' else
+                    ycenter-light_guide[1]*0.7+j*1 )],
+                  total_width/nwave, 3*(i%2-0.5))
   '''top view'''
-  ycenter = 30 if detector_name == 'FBH' else 50 if detector_name != 'TOF' else 30
+  ycenter = 30 if target_name == 'FBH' else 50 if target_name != 'TOF' else 30
   print('%% top view')
   if not no_view_label:
     draw_text([a4size[0]/2+view_position, ycenter+t+2], 'Cross-sectional', False, 6)
@@ -547,22 +707,24 @@ def draw_detector():
   for i in range(n):
     x = ((a4size[0] - total_width)/2
             if i == 0 else x + widths[i - 1] - overlap)
-    if ((detector_name == 'TOF' and (abs(i -n/2+0.5) < 2)) or
-        (detector_name == 'SCH' and (i == n/2 or i == n/2-1))):
+    if ((target_name == 'TOF' and (abs(i -n/2+0.5) < 2)) or
+        (target_name == 'SCH' and (i == n/2 or i == n/2-1))):
       if i == n/2:
         draw_text([a4size[0]/2, ycenter], '...', False, 10)
       continue
     draw_square([x, ycenter + zdiff*(1-i%2)], widths[i], t, line_width,
                 ((i%2+1)*0.8 if n%2 == 1 else (2-i%2)*0.8))
-    if detector_name == 'FBH' or detector_name == 'SCH':
+    if target_name == 'FBH' or target_name == 'SCH':
       draw_circle([x + widths[i]/2, ycenter + zdiff*(1-i%2) + 0.5*scale], 0.5*scale)
+      if i == 4:
+        draw_line_with_scale([x+widths[i]/2-0.5*scale, ycenter + zdiff*(1-i%2)], 1*scale, -10)
       if i > 0:
         continue
-    if detector_name == 'SCH' and i > 0:
+    if target_name == 'SCH' and i > 0:
       continue
-    if detector_name == 'TOF' and i > 0:
+    if target_name == 'TOF' and i > 0:
       continue
-    if detector_name == 'BH1' and i > 5:
+    if target_name == 'BH1' and i > 5:
       continue
     if i == 0:
       draw_line_with_scale([x, ycenter + zdiff*(1-i%2)], -10, t, True)
@@ -574,7 +736,10 @@ def draw_detector():
                          total_width_height)
   draw_arrow([(a4size[0] + total_width)/2-widths[0], ycenter+zdiff], 0, t, 3)
   if overlap > 0:
-    draw_line_with_scale([(a4size[0] + total_width)/2-widths[0], ycenter+zdiff], overlap, -scale_height/2)
+    draw_arrow([(a4size[0] + total_width)/2-widths[0], ycenter], 0, zdiff, 3)
+    draw_arrow([(a4size[0] + total_width)/2-widths[0]+overlap, ycenter], 0, zdiff, 3)
+    draw_line_with_scale([(a4size[0] + total_width)/2-widths[0], ycenter+zdiff*(1-n%2)],
+                         overlap, (-scale_height*(n%2-0.5)*zdiff/t + n%2*scale_height_offset))
   draw_text([a4size[0]/2, ycenter - upstream_position], 'Upstream')
   draw_text([a4size[0]/2, ycenter + downstream_position], 'Downstream')
   '''height, overlap and unit'''
@@ -592,10 +757,10 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
   rwidth = width/scale
   if abs(rwidth - round(rwidth)) < 0.0001:
     rwidth = round(rwidth)
-  if detector_name == 'EMULSION':
+  if target_name == 'EMULSION':
     lr = -1 if rotate else 1
     rotate= False
-  if detector_name != 'BACp':
+  if target_name != 'BACp':
     for i in range(2):
       if rotate:
         print('newpath {} {} moveto'.format(moveto[0], moveto[1]+i*height))
@@ -606,24 +771,29 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       print('closepath 0.1 setlinewidth stroke')
   if rotate:
     moveto[0] += width * 0.75
-    draw_arrow(moveto, 0, height)
-    if detector_name == 'Collimator' or 'BC' in detector_name:
-      moveto[0] += 2.5
-      if height/scale < 60:
-        moveto[0] -= 2
+    if height < 5:
+      draw_arrow([moveto[0], moveto[1]-4], 0, 4, 2)
+      draw_arrow([moveto[0], moveto[1]+height], 0, 4, 1)
+      moveto[0] += width*0.25
     else:
-      if height < 10:
-        moveto[0] += -3
-      if detector_name == 'TOF':
-        moveto[0] += 1
+      draw_arrow(moveto, 0, height)
+      if target_name == 'Collimator' or 'BC' in target_name:
+        moveto[0] += 2.5
+        if height/scale < 60:
+          moveto[0] -= 2
+      else:
+        if height < 10:
+          moveto[0] += -3
+        if target_name == 'TOF':
+          moveto[0] += 1
   else:
-    if detector_name == 'EMULSION' and width > 2:
+    if target_name == 'EMULSION' and width > 2:
       moveto[1] += height * 0.75
       draw_arrow(moveto, width, 0)
       moveto[1] += height * 0.25
       if rwidth == 100:
         moveto[0] += lr*width*0.75
-    elif width > 5 or 'BC' in detector_name or detector_name == 'BFT':
+    elif width > 5 or 'BC' in target_name or target_name == 'BFT':
       moveto[1] += height * 0.75
       draw_arrow(moveto, width, 0)
     else:
@@ -633,19 +803,20 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       moveto[0] += 4 + width
       draw_arrow(moveto, 4, 0, 1)
       moveto[0] += -width/2 + 3
-      if detector_name == 'FBH':
-        moveto[0] += -width/2 + 5
-        moveto[1] += -6
+      if abs(round(rwidth) - rwidth) > 0.1:
+        moveto[0] += -width/2 + 3
+        # moveto[1] += -6
   print('{} {} moveto'.format(moveto[0] if rotate else moveto[0] + 0.5*width,
                               moveto[1]+height/2 if rotate else moveto[1]+1))
-  if rotate:
-    print('({}) dup stringwidth pop 0 exch -2 div 0 exch rmoveto'.format(rwidth))
-  real_length = (11760 if detector_name == 'EMULSION' and rwidth > 1000 else
-                 1805 if detector_name == 'TOF' and width > 100 else
-                 673 if detector_name == 'SCH' and width > 100 else
+  real_length = (11760 if target_name == 'EMULSION' and rwidth > 1000 else
+                 1805 if target_name == 'TOF' and width > 100 else
+                 673 if target_name == 'SCH' and width > 100 else
                  height/scale if rotate else rwidth)
+  real_length = round(real_length) if abs(real_length - round(real_length)) < 0.001 else real_length
+  if rotate:
+    print('({}) dup stringwidth pop 0 exch -2 div 0 exch rmoveto'.format(real_length))
   print('({}) dup stringwidth pop -2 div 0 rmoveto {} show {}'
-        .format(round(real_length) if abs(real_length - round(real_length)) < 0.001 else real_length,
+        .format(real_length,
                 '90 rotate' if rotate else '',
                 '-90 rotate' if rotate else ''))
 
@@ -674,7 +845,7 @@ def draw_polygon3d(moveto, w, h, t, lw, fc):
 #_______________________________________________________________________________
 def draw_square(moveto, width, height, line_width=0.1, fill_color=1.0):
   ''' draw square '''
-  if detector_name == 'DAQ':
+  if target_name == 'DAQ':
     line_width = 0.1
   print('0 setgray')
   print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
@@ -689,10 +860,10 @@ def draw_square(moveto, width, height, line_width=0.1, fill_color=1.0):
 #_______________________________________________________________________________
 def draw():
   ''' draw main function '''
-  if len(detector_name) == 0:
-    raise Exception('%% No detector name')
+  if not target_name in supported:
+    raise Exception('%% target name \"{}\" is not supported'.format(target_name))
   print('%!PS-Adobe-3.0 EPSF-3.0')
-  print('%%Title: drawing of {}'.format(detector_name))
+  print('%%Title: drawing of {}'.format(target_name))
   print('%%Creator: Shuhei Hayakawa')
   print('%%CreationDate: {}'.format(datetime.datetime.now()))
   print('%%Orientation: Portrait')
@@ -701,7 +872,7 @@ def draw():
   print('')
   print('/Times-Roman findfont {} scalefont setfont'.format(default_text_size))
   print('2.8571429 2.8571429 scale % change unit to [mm]')
-  draw_detector()
+  draw_target()
   print('showpage')
 
 #_______________________________________________________________________________
@@ -713,15 +884,18 @@ def draw_wave(moveto, width, height, stroke=True):
   print('gsave 0.1 setlinewidth {}'.format('stroke closepath' if stroke else ''))
 
 #_______________________________________________________________________________
-def draw_text(moveto, text, rotate=False, text_size=5, font='Times-Roman'):
+def draw_text(moveto, text, rotate=False, text_size=5, font='Times-Roman', centering=True):
   ''' draw text '''
   print('0 setgray')
   print('/{} findfont {} scalefont setfont'.format(font, text_size))
   print('{} {} moveto'.format(moveto[0], moveto[1]))
   if rotate:
     print('({}) dup stringwidth pop 0 exch -2 div 0 exch rmoveto'.format(text))
-  print('({}) dup stringwidth pop 2 div 0 exch sub 0 rmoveto {} show {}'
-        .format(text, '90 rotate' if rotate else '', '-90 rotate' if rotate else ''))
+  print('({})'.format(text))
+  if centering:
+    print('dup stringwidth pop 2 div 0 exch sub 0 rmoveto'.format(text))
+  print('{} show {}'
+        .format('90 rotate' if rotate else '', '-90 rotate' if rotate else ''))
   print('/Times-Roman findfont {} scalefont setfont'.format(default_text_size))
 
 #_______________________________________________________________________________
@@ -730,9 +904,12 @@ def draw_text_box(moveto, text, text_size=5.):
   t = text.split()
   w = (text_size*max(len(t[0]), len(t[1])) if len(t) > 1 else text_size*len(text))
   h = text_size*9 if len(t) > 1 else text_size*2
-  if detector_name == 'DAQ':
+  if target_name == 'DAQ':
     w = wdaq
     h = hdaq
+  if target_name == 'MATRIX':
+    w = wmtx
+    h = hmtx
   draw_square(moveto, w, h, 0.1, 0.95 if 'RM' in text else -1)
   print('0 setgray')
   print('/Times-Roman findfont {} scalefont setfont'.format(text_size))
@@ -1297,19 +1474,63 @@ def draw_matrix():
   ypitch = 24
   l = 20
   nseg = [24, 64, 16, 16]
-  for i, name in enumerate(['TOF MT', 'SCH', 'FBH-U', 'FBH-D']):
+  for i, name in enumerate(['TOF', 'SCH', 'FBH-U', 'FBH-D']):
     draw_text([xstart, ystart-i*ypitch], name)
     draw_text([xstart+0.25*l, ystart-i*ypitch-10], nseg[i])
-    draw_arrow([xstart-0.5*l, ystart-5-i*ypitch], l, 0, 2)
+    draw_arrow([xstart-0.5*l, ystart-5-i*ypitch], (4.5 if i <= 1 else 1.5 if i == 2 else 1.25)*l,
+               0, 3)
     draw_arrow([xstart-2, ystart-7-i*ypitch], 4, 4, 3)
+    if i < 3:
+      draw_circle([xstart+4*l-0.25*(3.5-i)*l,
+                   ystart-5-13/6*ypitch if i == 2 else ystart-5-i*ypitch], 1, 0)
+      draw_text_box([xstart+4*l, ystart-5-i*ypitch-hmtx*(2/3 if i == 0 else 2/4)],
+                    'Matrix 2D' if i == 0 else 'Matrix 3D' if i == 1 else 'TDC')
+  # draw_elip([xstart+8*l, ystart-4-2*ypitch], 18, 0.5)
+  # draw_text([xstart+8*l, ystart-5-2*ypitch], 'network')
+  draw_arrow([xstart+0.75*l, ystart-5-3*ypitch], 0, 2/3*ypitch, 3)
+  draw_arrow([xstart+0.75*l, ystart-5-7/3*ypitch], 0.25*l, 0, 3)
+  draw_logic_and([xstart+1.*l, ystart-5-(9/4+1/6)*ypitch], ypitch/2)
+  draw_arrow([xstart+1.*l+0.375*ypitch, ystart-5-(7/3-1/6)*ypitch], 3*l-0.375*ypitch, 0, 3)
+  draw_text([xstart+2*l+0.175*ypitch, ystart-3-(7/3-1/6)*ypitch], 'Clustering', False, 4)
+  draw_text([xstart+3.25*l, ystart-7-(7/3-1/6)*ypitch-3], '31')
+  draw_arrow([xstart+3*l, ystart-7-(7/3-1/6)*ypitch], 4, 4, 3)
+  for i in range(4):
+    draw_square([xstart+2*l+0.175*ypitch-8+(i%2)*2, ystart-15-(7/3-1/6)*ypitch-i*5], 2, 7.5)
+    draw_square([xstart+2*l+0.175*ypitch+5, ystart-15-(7/3-1/6)*ypitch-i*5], 2, 7.5, 0.1, -1)
+  draw_arrow([xstart+2*l+0.175*ypitch-2, ystart-15-(7/3-1/6)*ypitch-3.75], 5, 0, 2)
+  draw_arrow([xstart+(4-0.25*3.5)*l, ystart-5], 0, -13/6*ypitch+1/2*hmtx, 3)
+  draw_arrow([xstart+(4-0.25*3.5)*l, ystart-5-ypitch+1/4*hmtx], 0.25*3.5*l, 0, 3)
+  draw_arrow([xstart+(4-0.25*3.5)*l, ystart-5-13/6*ypitch+1/2*hmtx], 0.25*3.5*l, 0, 3)
+  draw_arrow([xstart+4*l+wmtx, ystart-5-1/6*hmtx], 1*l, 0, 3)
+
+  draw_arrow([xstart+(4-0.25*2.5)*l, ystart-5-ypitch], 0, ypitch-1/3*hmtx, 3)
+  draw_arrow([xstart+(4-0.25*2.5)*l, ystart-5-ypitch], 0, -7/6*ypitch+1/4*hmtx, 3)
+  draw_arrow([xstart+(4-0.25*2.5)*l, ystart-5-1/3*hmtx], 0.25*2.5*l, 0, 3)
+  draw_arrow([xstart+(4-0.25*2.5)*l, ystart-5-13/6*ypitch+1/4*hmtx], 0.25*2.5*l, 0, 3)
+  draw_arrow([xstart+4*l+wmtx, ystart-5-ypitch], 0.5*l, 0, 3)
+  draw_arrow([xstart+4.5*l+wmtx, ystart-5-ypitch], 0, 2/3*ypitch-1/6*hmtx, 3)
+  draw_arrow([xstart+4.5*l+wmtx, ystart-5-1/3*ypitch-1/6*hmtx], 0.5*l, 0, 3)
+  draw_circle([xstart+5*l+wmtx-1, ystart-5-1/3*ypitch-1/6*hmtx], 1) #
+  draw_logic_and([xstart+5*l+wmtx, ystart-5-5/12*ypitch-1/6*hmtx], ypitch/2)
+  draw_arrow([xstart+5*l+wmtx+0.375*ypitch, ystart-5-1/6*ypitch-1/6*hmtx], 1.5*l, 0, 2)
+  draw_text([xstart+5.75*l+wmtx+0.375*ypitch, ystart-2-1/6*ypitch-1/6*hmtx], 'Accept', False, 5)
+
+  draw_arrow([xstart+(4-0.25*1.5)*l, ystart-5-13/6*ypitch], 0, 7/6*ypitch-1/4*hmtx, 3)
+  draw_arrow([xstart+(4-0.25*1.5)*l, ystart-5-ypitch-1/4*hmtx], 0.25*1.5*l, 0, 3)
+    # draw_arrow([xstart+0.5*l, ystart-5-i*ypitch], l, 0, 2)
+    # draw_text_box([xstart+0.5*l+wdaq, ystart-5-i*ypitch-hdaq/2], 'width')
 
 #_______________________________________________________________________________
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument('detector_name', help='target detector name')
+  parser.add_argument('target_name', help='drawing target name, supported as follows.\n' +
+                      'BH1, BH2, BAC, FBH, EMULSION, SCH, TOF, TRIGGER, MATRIX, DAQ and SU3')
   parsed, unparsed = parser.parse_known_args()
-  detector_name = parsed.detector_name.upper()
+  target_name = parsed.target_name.upper()
   try:
-    draw()
+    if target_name == 'SU3':
+      draw_su3()
+    else:
+      draw()
   except:
     print(sys.exc_info()[1])

@@ -65,8 +65,8 @@ def show(input_file, output_dir):
         g4.SetPoint(ipoint, ion_energy, long_strg)
         g5.SetPoint(ipoint, ion_energy, late_strg)
         g6.SetPoint(ipoint, ion_energy, tota_strg)
-        re_range = re.RangeFromKE(alpha_mass, ion_energy, 2, 3.4)
-        re_strg = re.RangeStragglingFromKE(alpha_mass, ion_energy, 2, 3.4)
+        re_range = re.RangeFromKE(alpha_mass, ion_energy, 2, 3.5443)
+        re_strg = re.RangeStragglingFromKE(alpha_mass, ion_energy, 2, 3.5443)
         g7.SetPoint(ipoint, ion_energy, re_range)
         g7.SetPointError(ipoint, ion_energy, re_strg)
         g8.SetPoint(ipoint, ion_energy, re_strg/tota_strg)
@@ -111,8 +111,8 @@ def show(input_file, output_dir):
                         '#color['+str(ROOT.kOrange+1)+']{SRIM}'))
   tex.DrawLatex(0.22, 0.70, 'R_{} = {:.3f} #pm {:.3f} #mum ({})'
                 .format('{#alpha}',
-                        re.RangeFromKE(alpha_mass, alpha_energy, 2, 3.4),
-                        re.RangeStragglingFromKE(alpha_mass, alpha_energy, 2, 3.4),
+                        re.RangeFromKE(alpha_mass, alpha_energy, 2, 3.5443),
+                        re.RangeStragglingFromKE(alpha_mass, alpha_energy, 2, 3.5443),
                         '#color['+str(ROOT.kBlue+1)+']{RangeEnergy}'))
   tex.SetTextSize(0.035)
   tex.DrawLatex(0.78, 0.02, 'Energy [MeV]')

@@ -13,6 +13,7 @@ import rangeenergy
 #_______________________________________________________________________________
 alpha_mass = 3727.379
 alpha_energy = 8.784861
+theta_cut = 4. # deg
 
 #_______________________________________________________________________________
 def calc_energy(e):
@@ -29,13 +30,13 @@ def calc_range(r):
                         1e+3)
 
 #_______________________________________________________________________________
-def show(input_file, output_dir):
+def show(emulsion_density, input_file, output_dir):
   ROOT.gROOT.SetBatch()
   ROOT.gStyle.SetOptStat(1110)
   ROOT.gStyle.SetOptFit(1)
   re = rangeenergy.RangeEnergy()
   c1 = ROOT.TCanvas()
-  h1 = ROOT.TH1F('h1', 'h1', 100, 48, 58) # z
+  h1 = ROOT.TH1F('h1', 'h1', 100, 46, 56) # z
   h1.GetXaxis().SetTitle('Range [#mum]')
   h2 = ROOT.TH1F('h2', 'h2', 100, 0, 45) # theta
   h2.GetXaxis().SetTitle('#theta [Deg.]')
@@ -59,7 +60,7 @@ def show(input_file, output_dir):
       z = float(columns[1])*1e-4
       v = ROOT.TVector3(x, y, z)
       h2.Fill(v.Theta()*ROOT.TMath.RadToDeg())
-      if v.Theta()*ROOT.TMath.RadToDeg() > 5.: continue
+      if v.Theta()*ROOT.TMath.RadToDeg() > theta_cut: continue
       h1.Fill(v.Mag())
       h3.Fill(v.Phi()*ROOT.TMath.RadToDeg())
   f1 = ROOT.TF1('f1', 'gaus')
@@ -90,13 +91,18 @@ def show(input_file, output_dir):
                         '#color['+str(ROOT.kOrange+1)+']{TRIM}'))
   tex.DrawLatex(0.12, 0.55, 'R_{} = {:.3f} #pm {:.3f} #mum ({})'
                 .format('{#alpha}',
-                        re.RangeFromKE(alpha_mass, alpha_energy, 2, 3.4),
-                        re.RangeStragglingFromKE(alpha_mass, alpha_energy, 2, 3.4),
+                        re.RangeFromKE(alpha_mass, alpha_energy,
+                                       2, emulsion_density),
+                        re.RangeStragglingFromKE(alpha_mass, alpha_energy,
+                                                 2, emulsion_density),
                         '#color['+str(ROOT.kBlue+1)+']{RangeEnergy}'))
   c1.Print(os.path.join(output_dir, 'trim.pdf'))
 #_______________________________________________________________________________
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
+  parser.add_argument('emulsion_density', type=float, nargs='?',
+                      help='emulsion density (default=3.544)',
+                      default=3.544)
   parser.add_argument('input_file',
                       help='default TRIM output file.')
   parser.add_argument('output_dir', nargs='?',
@@ -104,6 +110,6 @@ if __name__ == '__main__':
                       help='default canvas output directory.')
   parsed, unpased = parser.parse_known_args()
   try:
-    show(parsed.input_file, parsed.output_dir)
+    show(parsed.emulsion_density, parsed.input_file, parsed.output_dir)
   except:
     print(sys.exc_info())

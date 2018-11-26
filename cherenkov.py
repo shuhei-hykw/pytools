@@ -4,19 +4,21 @@
 import argparse
 import os
 import sys
-import ROOT
 
 #_______________________________________________________________________________
-particle = [# {'name': '#font[12]{e}', 'pdg': 11, 'color': ROOT.kCyan+1, 'position': [0.1, 0.1]},
-            {'name': '#mu', 'pdg': 13, 'color': ROOT.kBlack, 'position': [0.21, 0.21]},
-            {'name': '#pi', 'pdg': 211, 'color': ROOT.kBlue+1, 'position': [0.32, 0.32]},
-            {'name': '#font[12]{K}', 'pdg': 321, 'color': ROOT.kGreen+1, 'position': [0.51, 0.51]},
-            {'name': '#font[12]{p}', 'pdg': 2212, 'color': ROOT.kRed+1, 'position': [0.71, 0.71]}]
-
+particle = []
 index_min = 1.0
 index_max = 1.3
 p_min = 0.0
 p_max = 2.0
+
+#_______________________________________________________________________________
+def initialize():
+  particle.append({'name': '#font[12]{e}', 'pdg': 11, 'color': ROOT.kCyan+1, 'position': [0.1, 0.1]})
+  particle.append({'name': '#mu', 'pdg': 13, 'color': ROOT.kBlack, 'position': [0.21, 0.21]})
+  particle.append({'name': '#pi', 'pdg': 211, 'color': ROOT.kBlue+1, 'position': [0.32, 0.32]})
+  particle.append({'name': '#font[12]{K}', 'pdg': 321, 'color': ROOT.kGreen+1, 'position': [0.51, 0.51]})
+  particle.append({'name': '#font[12]{p}', 'pdg': 2212, 'color': ROOT.kRed+1, 'position': [0.71, 0.71]})
 
 #_______________________________________________________________________________
 def mass(pdg_code):
@@ -76,6 +78,8 @@ if __name__ == '__main__':
                       action='store_true', help='print with gray scale')
   parsed, unpased = parser.parse_known_args()
   try:
+    import ROOT
+    initialize()
     show(parsed.target_index, parsed.gray_scale)
   except:
     print(sys.exc_info())

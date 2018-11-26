@@ -15,6 +15,7 @@ Supported targets are as follows.
  - FBH_MPPC
  - FAC
  - SCH
+ - SCH_MPPC
  - MPPC_CIRCUIT
  - TOF
  - EMULSION
@@ -50,7 +51,7 @@ import settings
 #_______________________________________________________________________________
 supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'FBH_MPPC', 'MPPC_CIRCUIT', 'FAC', 'SDC1',
-             'SCH', 'SDC2', 'SDC3', 'TOF',
+             'SCH', 'SCH_MPPC', 'SDC2', 'SDC3', 'TOF',
              'EMULSION',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT']
 
@@ -89,6 +90,8 @@ def draw_target():
     draw_fac.draw()
   elif settings.target == 'SCH':
     draw_hodoscope.draw_sch()
+  elif settings.target == 'SCH_MPPC':
+    draw_mppc.draw_sch()
   elif settings.target == 'TOF':
     draw_hodoscope.draw_tof()
   elif settings.target == 'BC34':
@@ -121,8 +124,9 @@ def draw():
 #_______________________________________________________________________________
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument('target_name', help='drawing target name, supported as follows.\n' +
-                      'BH1, BH2, BAC, FBH, EMULSION, SCH, TOF, TRIGGER, MATRIX, DAQ and SU3')
+  help_out = ('drawing target name, supported as follows. '
+              + str(supported).replace('[', '').replace(']', ''))
+  parser.add_argument('target_name', help=help_out)
   parsed, unparsed = parser.parse_known_args()
   settings.set_target(parsed.target_name.upper())
   try:

@@ -17,8 +17,12 @@ def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
   db.draw_square([xstart, ystart], board['width'], board['height'])
   db.draw_line_with_scale([xstart, ystart], -5, board['height'],
                           rotate=True)
-  db.draw_line_with_scale([xstart, ystart+board['height']],
-                          board['width'], 5)
+  if 'FBH' in settings.target:
+    db.draw_line_with_scale([xstart, ystart+board['height']],
+                            board['width'], 5)
+  if 'SCH' in settings.target:
+    db.draw_line_with_scale([xstart, ystart],
+                            board['width'], -9)
   s = mppc['rcsize']
   fc=0.6
   for p in mppc['pitches']:
@@ -57,14 +61,25 @@ def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
   db.draw_square([xstart+sma['position'][0]-sma['size'][0]/2,
                   ystart+sma['position'][1]-sma['size'][1]/2],
                  sma['size'][1], sma['size'][1], fill_color=0.9)
-  db.draw_arrow([xstart+board['width']/2, ystart+3.5], 0, -5, 3)
-  db.draw_text([xstart+board['width']/2, ystart-5], 'Connector to EASIROC')
-  db.draw_arrow([xstart+gnd['position'][0]-3, ystart+gnd['position'][1]-3],
-                -4, -4, 3)
-  db.draw_text([xstart+gnd['position'][0]-10, ystart-5], 'GND')
-  db.draw_arrow([xstart+sma['position'][0]+2, ystart+sma['position'][1]-2],
-                5, -5, 3)
-  db.draw_text([xstart+sma['position'][0]+10, ystart-5], 'Bias input')
+  if 'FBH' in settings.target:
+    db.draw_arrow([xstart+board['width']/2, ystart+3.5], 0, -5, 3)
+    db.draw_text([xstart+board['width']/2, ystart-5], 'Connector to EASIROC')
+    db.draw_arrow([xstart+gnd['position'][0]-3, ystart+gnd['position'][1]-3],
+                  -4, -4, 3)
+    db.draw_text([xstart+gnd['position'][0]-10, ystart-5], 'GND')
+    db.draw_arrow([xstart+sma['position'][0]+2, ystart+sma['position'][1]-2],
+                  5, -5, 3)
+    db.draw_text([xstart+sma['position'][0]+10, ystart-5], 'Bias input')
+  elif 'SCH' in settings.target:
+    db.draw_arrow([xstart+board['width']/2,
+                   ystart+connector['position'][1]+connector['size'][1]/2-1], 0, 7, 3)
+    db.draw_text([xstart+board['width']/2,
+                  ystart+board['height']+4], 'Connector to EASIROC')
+    db.draw_arrow([xstart+gnd['position'][0]-3,
+                   ystart+gnd['position'][1]+3], -4, 7, 3)
+    db.draw_text([xstart+gnd['position'][0]-10, ystart+board['height']+4], 'GND')
+    db.draw_arrow([xstart+sma['position'][0]+2, ystart+sma['position'][1]+2], 5, 8, 3)
+    db.draw_text([xstart+sma['position'][0]+10, ystart+board['height']+4], 'Bias input')
   db.draw_text([xstart-12, ystart+board['height']/2], 'Front', rotate=True)
   '''back'''
   ystart -= board['height'] + 25
@@ -75,15 +90,22 @@ def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
                    mppc['size'], mppc['size'], fill_color=0.8)
   for h in hole['position']:
     db.draw_circle([xstart + h[0], ystart + h[1]], hole['diameter'])
+  if 'FBH' in settings.target:
+    db.draw_arrow([xstart+board['width']/2+mppc['pitches'][5],
+                   ystart+board['height']-5], 0, 8, 3)
+    db.draw_text([xstart+board['width']/2+mppc['pitches'][5],
+                  ystart+board['height']+4],
+                 'Sensor of MPPC')
+  elif 'SCH' in settings.target:
+    db.draw_arrow([xstart+board['width']/2+mppc['pitches'][5],
+                   ystart+mppc['height']], 0, 8, 3)
+    db.draw_text([xstart+board['width']/2+mppc['pitches'][5],
+                  ystart+mppc['height']+10],
+                 'Sensor of MPPC')
   db.draw_arrow([xstart+hole['position'][-1][0],
                  ystart-1.5], 0, 1.5+hole['position'][-1][1], 3)
   db.draw_text([xstart+hole['position'][-1][0],
                 ystart-5], 'Through hole')
-  db.draw_arrow([xstart+board['width']/2+mppc['pitches'][5],
-                 ystart+board['height']-5], 0, 8, 3)
-  db.draw_text([xstart+board['width']/2+mppc['pitches'][5],
-                ystart+board['height']+4],
-               'Sensor of MPPC')
   db.draw_text([xstart-12, ystart+board['height']/2], 'Back', rotate=True)
   db.draw_text([xstart+board['width']+10, ystart-16], '[mm]')
 
@@ -182,5 +204,44 @@ def draw_fbh(scale=1):
   sma['size'] = [6.7*scale, 6.7*scale]
   sma['rcsize'] = 2*scale
   sma['rc'] = [75*scale, 11*scale]
+  #sma['size'] = [15.6*scale, 6.7*scale]
+  draw(board, mppc, hole, gnd, connector, sma)
+
+#_______________________________________________________________________________
+def draw_sch(scale=1):
+  settings.set_scale(scale)
+  board = {}
+  mppc = {}
+  hole = {}
+  gnd = {}
+  connector = {}
+  sma = {}
+  board['width'] = 139*scale
+  board['height'] = 45*scale
+  mppc['pitches'] = [(x-7.5)*7*scale for x in range(16)]
+  mppc['height'] = 22.5*scale
+  mppc['size'] = 2*scale
+  mppc['rcsize'] = 1*scale
+  mppc['rc'] = [[-0.75*mppc['rcsize'], -0.5*mppc['rcsize']],
+                [-0.75*mppc['rcsize'], -2.5*mppc['rcsize']],
+                [ 0.75*mppc['rcsize'], -0.5*mppc['rcsize']],
+                [ 2.25*mppc['rcsize'],  0.25*mppc['rcsize']]]
+  hole['diameter'] = 1*scale
+  hole['position'] = [[ 10*scale,  9.25*scale], [ 10*scale, 17.25*scale],
+                      [ 10*scale, 27.75*scale], [ 10*scale, 35.75*scale],
+                      [ 30*scale,  9.25*scale],
+                      [ 30*scale, 27.75*scale], [ 30*scale, 35.75*scale],
+                      [109*scale,  9.25*scale],
+                      [109*scale, 27.75*scale], [109*scale, 35.75*scale],
+                      [129*scale, 35.75*scale], [129*scale, 17.25*scale],
+                      [129*scale, 27.75*scale], [129*scale,  9.25*scale]]
+  gnd['position'] = [39.5*scale, 37*scale]
+  gnd['size'] = 10.5*scale
+  connector['position'] = [69.5*scale, 37*scale]
+  connector['size'] = [43.2*scale, 8*scale]
+  sma['position'] = [100.5*scale, 37*scale]
+  sma['size'] = [6.7*scale, 6.7*scale]
+  sma['rcsize'] = 2*scale
+  sma['rc'] = [99.5*scale, 32*scale]
   #sma['size'] = [15.6*scale, 6.7*scale]
   draw(board, mppc, hole, gnd, connector, sma)

@@ -33,7 +33,7 @@ def draw_line(moveto, x, y, color='black', lw=0.1, dash=None):
   print('{} setlinewidth stroke'.format(lw))
 
 #_______________________________________________________________________________
-def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0):
+def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0, mfill=0.):
   # mark = 0:both 1:first 2:last 3:none
   ''' draw arrow '''
   if width == 0 and height == 0: return
@@ -78,8 +78,8 @@ def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0):
     mf = [0.5*(m3[0] + m4[0]), 0.5*(m3[1] + m4[1])]
   else:
     mf = [moveto[0] + width, moveto[1] + height]
-  print('closepath gsave fill grestore {} setlinewidth stroke'
-        .format(0.0001 if mark != 3 else lw))
+  print('closepath gsave {} setgray fill grestore {} setlinewidth stroke'
+        .format(mfill, 0.0001 if mark != 3 else lw))
   if mark != 3:
     print('newpath {} {} moveto'.format(mi[0], mi[1]))
     print('{} {} rlineto'.format(mf[0] - mi[0], mf[1] - mi[1]))
@@ -165,7 +165,7 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       moveto[0] += width*0.25
     else:
       draw_arrow(moveto, 0, height)
-      if settings.target == 'Collimator' or 'BC' in settings.target:
+      if settings.target == 'COLLIMATOR' or 'BC' in settings.target:
         moveto[0] += 2.5
         if height/settings.scale < 60:
           moveto[0] -= 2
@@ -242,6 +242,24 @@ def draw_square(moveto, width, height, line_width=0.1, fill_color=1.0):
   print('{} {} rlineto'.format(width, 0))
   print('{} {} rlineto'.format(0, height))
   print('{} {} rlineto closepath'.format(-width, 0))
+  if fill_color >= 0:
+    print('{} setgray gsave fill grestore 0 setgray'.format(fill_color))
+  if line_width > 0:
+    print('{} setlinewidth gsave stroke grestore'.format(line_width))
+
+#_______________________________________________________________________________
+def draw_triangle(moveto, width, height, line_width=0.1, fill_color=1.0, rotate=False):
+  ''' draw square '''
+  if settings.target == 'DAQ':
+    line_width = 0.1
+  print('0 setgray')
+  print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
+  if rotate:
+    print('{} {} rlineto'.format(0, height))
+    print('{} {} rlineto closepath'.format(width, -height/2))
+  else:
+    print('{} {} rlineto'.format(width, 0))
+    print('{} {} rlineto closepath'.format(-width/2, height))
   if fill_color >= 0:
     print('{} setgray gsave fill grestore 0 setgray'.format(fill_color))
   if line_width > 0:

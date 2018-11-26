@@ -12,7 +12,10 @@ Supported targets are as follows.
  - BAC
  - Collimator
  - FBH
+ - FBH_MPPC
+ - FAC
  - SCH
+ - MPPC_CIRCUIT
  - TOF
  - EMULSION
  - TRIGGER
@@ -34,8 +37,10 @@ import draw_bft
 import draw_collimator
 import draw_daq
 import draw_emulsion
+import draw_fac
 import draw_hodoscope
 import draw_matrix
+import draw_mppc
 import draw_product
 import draw_sdc123
 import draw_su3
@@ -43,7 +48,8 @@ import draw_trigger
 import settings
 
 #_______________________________________________________________________________
-supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH', 'SDC1',
+supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
+             'FBH_MPPC', 'MPPC_CIRCUIT', 'FAC', 'SDC1',
              'SCH', 'SDC2', 'SDC3', 'TOF',
              'EMULSION',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT']
@@ -75,21 +81,14 @@ def draw_target():
     draw_bac.draw()
   elif settings.target == 'FBH':
     draw_hodoscope.draw_fbh()
+  elif settings.target == 'FBH_MPPC':
+    draw_mppc.draw_fbh()
+  elif settings.target == 'MPPC_CIRCUIT':
+    draw_mppc.draw_circuit()
+  elif settings.target == 'FAC':
+    draw_fac.draw()
   elif settings.target == 'SCH':
-    scale = 1.7
-    t = 2*scale
-    widths = [11.5*scale for i in range(8)]
-    height = 450*scale
-    overlap = 1.0*scale
-    zdiff = -t
-    height_position = [-5, -25]
-    overlap_position = [-5, -30]
-    unit_position = [5, -25]
-    scale_height = 20
-    scale_height_offset = 0
-    total_width_height = 15
-    upstream_position = 20
-    downstream_position = 25
+    draw_hodoscope.draw_sch()
   elif settings.target == 'TOF':
     draw_hodoscope.draw_tof()
   elif settings.target == 'BC34':

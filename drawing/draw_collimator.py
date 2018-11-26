@@ -50,8 +50,11 @@ def draw():
   db.draw_line_with_scale([xoffset+gap_tan[0], yoffset+height[1]], -4, height[0], True)
   db.draw_line_with_scale([xoffset, yoffset-lead[1]*2], -18+gap_tan[0],
                        height[0]+height[1]*2+lead[1]*4, True)
-  db.draw_text([xoffset+width/2, 260], 'Front view', False, 6 )
+  # db.draw_text([xoffset+width/2, 260], 'Front view', False, 6 )
   db.draw_text([xoffset+6.5, yoffset-lead[1]*2+1.5], 'Lead')
+  db.draw_beam_mark([xoffset+width/2, yoffset-lead[1]*2-10], 5)
+  db.draw_text([xoffset+width/2-12, yoffset-lead[1]*2-11.5], 'Beam')
+  db.draw_text([xoffset, 245], '(b)', text_size=7)
   # cross-sectional view
   xoffset = (a4size[0]-width)/2+open_tan[0]+40
   yoffset = a4size[1]/2
@@ -68,9 +71,11 @@ def draw():
   db.draw_line_with_scale([xoffset+w_tan+gap_tan[0], yoffset], open_tan[0], -10)
   db.draw_line_with_scale([xoffset+w_tan+gap_tan[1], yoffset+t], open_tan[1], 5)
   db.draw_text([xoffset+11+gap_tan[0], yoffset+1.5], 'Tungsten')
-  db.draw_text([xoffset+width/2, yoffset+t+15], 'Downstream')
-  db.draw_text([xoffset+width/2, yoffset-20], 'Upstream')
-  db.draw_text([xoffset+width/2, 260], 'Cross-sectional top view', False, 6)
+  db.draw_arrow([xoffset+width/2, yoffset+15], 0, t-30, 2)
+  db.draw_text([xoffset+width/2+4, yoffset+t/2], 'Beam', rotate=True)
+  # db.draw_text([xoffset+width/2, yoffset+t+15], 'Downstream')
+  # db.draw_text([xoffset+width/2, yoffset-20], 'Upstream')
+  # db.draw_text([xoffset+width/2, 260], 'Cross-sectional top view', False, 6)
 
 #_______________________________________________________________________________
 def set_version(ver):

@@ -9,20 +9,21 @@ import settings
 
 #_______________________________________________________________________________
 def draw():
-  scale = 0.5
+  scale = 0.3
   settings.set_scale(scale)
   xoffset = -30
-  width = 180*scale
-  height = 80*scale
-  window = [170*scale, 70*scale]
-  t1 = 11.5*4*scale
-  t2 = 90*scale
-  pmt = [3.0*25.4*scale, 60*scale]
-  pmt_dist = 90*scale
+  width = 241*scale
+  height = 165*scale
+  window = [225*scale, 162*scale]
+  t1 = 65*scale
+  t2 = 65*scale
+  pmt = [2.5*25.4*scale, 60*scale]
+  pmt_dist = 75*scale
   pmt_offset = (width - pmt_dist - pmt[0])/2
   '''front view'''
-  db.draw_square([(a4size[0]-width)/2+pmt_offset+xoffset, (a4size[1])/2-pmt[1]], pmt[0], pmt[1], line_width)
-  db.draw_square([(a4size[0]-width)/2-pmt_offset+xoffset+width, (a4size[1])/2-pmt[1]], -pmt[0], pmt[1], line_width)
+  db.draw_square([a4size[0]/2+xoffset-pmt[0]/2, (a4size[1])/2-pmt[1]], pmt[0], pmt[1], line_width)
+  db.draw_square([a4size[0]/2+xoffset-pmt[0]/2+pmt_dist, (a4size[1])/2-pmt[1]], pmt[0], pmt[1], line_width)
+  db.draw_square([a4size[0]/2+xoffset-pmt[0]/2-pmt_dist, (a4size[1])/2-pmt[1]], pmt[0], pmt[1], line_width)
   db.draw_square([(a4size[0]-width)/2+xoffset, a4size[1]/2], width, height, line_width)
   db.draw_square([(a4size[0]-window[0])/2+xoffset, (a4size[1]+height-window[1])/2], window[0], window[1], line_width, 0.8)
   db.draw_line_with_scale([(a4size[0]-width)/2+xoffset, a4size[1]/2+height], width, 16)
@@ -47,7 +48,7 @@ def draw():
   db.draw_polygon([(a4size[0]+t2)/2+xoffset, a4size[1]/2], [[-t2, 0], [0, height], [t1, 0]], line_width)
   db.draw_square([(a4size[0]-pmt[0])/2+xoffset, a4size[1]/2], pmt[0], -pmt[1], line_width, 1.0)
   for i in range(4):
-    db.draw_square([(a4size[0]-t2)/2+i*t1/4+xoffset, a4size[1]/2], 11.5*scale, height, line_width, 0.8)
+    db.draw_square([(a4size[0]-t2)/2+i*11.5/4+xoffset, a4size[1]/2], 11.5*scale, height, line_width, 0.8)
   db.draw_line_with_scale([(a4size[0]-t2)/2+xoffset, a4size[1]/2+height], t1, 5)
   db.draw_line_with_scale([(a4size[0]-t2)/2+xoffset, a4size[1]/2], t2, -10)
   db.draw_arrow([(a4size[0])/2+xoffset-2, (a4size[1])/2+height-6], 6, 4, 3)

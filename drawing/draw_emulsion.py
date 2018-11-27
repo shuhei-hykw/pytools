@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import draw_basic as db
+import settings
 
 #_______________________________________________________________________________
 def draw():
-  global scale
   full_draw = True
   unit = 1e0
   scale = 0.04*unit
+  settings.set_scale(scale)
   width = 10*345*scale
   #height = 10*350*scale
   height = 40

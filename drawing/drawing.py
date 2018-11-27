@@ -18,6 +18,7 @@ Supported targets are as follows.
  - SCH_MPPC
  - MPPC_CIRCUIT
  - TOF
+ - SSD
  - EMULSION
  - TRIGGER
  - MATRIX
@@ -44,6 +45,7 @@ import draw_matrix
 import draw_mppc
 import draw_product
 import draw_sdc123
+import draw_ssd
 import draw_su3
 import draw_trigger
 import settings
@@ -52,7 +54,7 @@ import settings
 supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'FBH_MPPC', 'MPPC_CIRCUIT', 'FAC', 'SDC1',
              'SCH', 'SCH_MPPC', 'SDC2', 'SDC3', 'TOF',
-             'EMULSION',
+             'SSD', 'EMULSION',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT']
 
 #_______________________________________________________________________________
@@ -64,6 +66,8 @@ def draw_target():
   ''' draw target '''
   if settings.target == 'COLLIMATOR':
     draw_collimator.draw()
+  elif settings.target == 'SSD':
+    draw_ssd.draw()
   elif settings.target == 'EMULSION':
     draw_emulsion.draw()
   elif settings.target == 'TRIGGER':

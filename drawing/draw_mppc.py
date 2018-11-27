@@ -12,12 +12,12 @@ def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
   xstart = (settings.a4size[0] - board['width'])/2
   ystart = 200
   '''front'''
-  if len(label) > 0:
-    db.draw_text([xstart-10, ystart+board['height']+20], label, text_size=8)
   db.draw_square([xstart, ystart], board['width'], board['height'])
   db.draw_line_with_scale([xstart, ystart], -5, board['height'],
                           rotate=True)
   if 'FBH' in settings.target:
+    if len(label) > 0:
+      db.draw_text([xstart-10, ystart+board['height']+20], label, text_size=8)
     db.draw_line_with_scale([xstart, ystart+board['height']],
                             board['width'], 5)
   if 'SCH' in settings.target:
@@ -95,13 +95,13 @@ def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
                    ystart+board['height']-5], 0, 8, 3)
     db.draw_text([xstart+board['width']/2+mppc['pitches'][5],
                   ystart+board['height']+4],
-                 'Sensor of MPPC')
+                 'Sensor of MPPC ' + mppc['type'])
   elif 'SCH' in settings.target:
     db.draw_arrow([xstart+board['width']/2+mppc['pitches'][5],
-                   ystart+mppc['height']], 0, 8, 3)
+                   ystart+mppc['height']], 0, 25, 3)
     db.draw_text([xstart+board['width']/2+mppc['pitches'][5],
-                  ystart+mppc['height']+10],
-                 'Sensor of MPPC')
+                  ystart+board['height']+4],
+                 'Sensor of MPPC ' + mppc['type'])
   db.draw_arrow([xstart+hole['position'][-1][0],
                  ystart-1.5], 0, 1.5+hole['position'][-1][1], 3)
   db.draw_text([xstart+hole['position'][-1][0],
@@ -183,6 +183,7 @@ def draw_fbh(scale=1):
   sma = {}
   board['width'] = 90*scale
   board['height'] = 30*scale
+  mppc['type'] = 'S12571-100P'
   mppc['pitches'] = [(x-7.5)*5*scale for x in range(16)]
   mppc['height'] = 25*scale
   mppc['size'] = 2*scale
@@ -218,6 +219,7 @@ def draw_sch(scale=1):
   sma = {}
   board['width'] = 139*scale
   board['height'] = 45*scale
+  mppc['type'] = 'S10362-11-100P'
   mppc['pitches'] = [(x-7.5)*7*scale for x in range(16)]
   mppc['height'] = 22.5*scale
   mppc['size'] = 2*scale

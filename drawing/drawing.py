@@ -13,12 +13,14 @@ Supported targets are as follows.
  - Collimator
  - FBH
  - FBH_MPPC
+ - PVAC
  - FAC
  - SCH
  - SCH_MPPC
  - MPPC_CIRCUIT
  - TOF
  - SSD
+ - DIAMOND
  - EMULSION
  - TRIGGER
  - MATRIX
@@ -38,12 +40,14 @@ import draw_bc34
 import draw_bft
 import draw_collimator
 import draw_daq
+import draw_diamond
 import draw_emulsion
 import draw_fac
 import draw_hodoscope
 import draw_matrix
 import draw_mppc
 import draw_product
+import draw_pvac
 import draw_sdc123
 import draw_ssd
 import draw_su3
@@ -52,9 +56,9 @@ import settings
 
 #_______________________________________________________________________________
 supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
-             'FBH_MPPC', 'MPPC_CIRCUIT', 'FAC', 'SDC1',
+             'FBH_MPPC', 'MPPC_CIRCUIT', 'PVAC', 'FAC', 'SDC1',
              'SCH', 'SCH_MPPC', 'SDC2', 'SDC3', 'TOF',
-             'SSD', 'EMULSION',
+             'SSD', 'DIAMOND', 'EMULSION',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT']
 
 #_______________________________________________________________________________
@@ -68,6 +72,8 @@ def draw_target():
     draw_collimator.draw()
   elif settings.target == 'SSD':
     draw_ssd.draw()
+  elif settings.target == 'DIAMOND':
+    draw_diamond.draw()
   elif settings.target == 'EMULSION':
     draw_emulsion.draw()
   elif settings.target == 'TRIGGER':
@@ -90,6 +96,8 @@ def draw_target():
     draw_mppc.draw_fbh()
   elif settings.target == 'MPPC_CIRCUIT':
     draw_mppc.draw_circuit()
+  elif settings.target == 'PVAC':
+    draw_pvac.draw()
   elif settings.target == 'FAC':
     draw_fac.draw()
   elif settings.target == 'SCH':

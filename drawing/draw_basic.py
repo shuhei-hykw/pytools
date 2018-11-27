@@ -172,6 +172,8 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       else:
         if height < 10:
           moveto[0] += -3
+        if settings.target == 'PVAC':
+          moveto[0] += 2.5
         if settings.target == 'TOF':
           moveto[0] += 1
         if 'SDC' in settings.target:

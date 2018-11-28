@@ -4,6 +4,8 @@
 import draw_basic as db
 import settings
 
+version = 2
+
 #_______________________________________________________________________________
 def draw():
   full_draw = True
@@ -20,7 +22,7 @@ def draw():
   thick_base = 40*scale/unit
   thick_full = thick_gel * 2 + thick_base
   space = 0
-  zigzag = 0 if full_draw else 2
+  zigzag = 2 if full_draw else 2
   x = 10
   y = 40
   ystart = y
@@ -63,10 +65,10 @@ def draw():
   db.draw_text([10+thin_gel+thin_base/2, y+height/4-8], 'thin-type sheet')
   db.draw_text([(10+x)/2, y+height/4-8], '11 thick-type sheets')
   db.draw_text([x-thin_gel-thin_base/2, y+height/4-8], 'thin-type sheet')
-  db.draw_text([x-thin_gel-thin_base/2, y+height+4], 'base')
-  db.draw_arrow([x-thin_gel-thin_base/2, y+height+2], 0, -4, 3)
-  db.draw_text([x-thin_full-thick_full+thick_gel/2, y+height+4], 'emulsion layer')
-  db.draw_arrow([x-thin_full-thick_full+thick_gel/2, y+height+2], 0, -4, 3)
+  db.draw_text([x-thin_gel-thin_base/2, y+height+4+zigzag], 'base film')
+  db.draw_arrow([x-thin_gel-thin_base/2, y+height+2+zigzag], 0, -4-zigzag, 3)
+  db.draw_text([x-thin_full-thick_full+thick_gel/2, y+height+4+zigzag], 'emulsion layer')
+  db.draw_arrow([x-thin_full-thick_full+thick_gel/2, y+height+2+zigzag], 0, -4, 3)
   db.draw_text([x+15, y], '[um]')
   width = x - 10
   if not full_draw:
@@ -96,11 +98,15 @@ def draw():
   db.draw_arrow([x+34, y+17], 4, 4, 3)
   db.draw_text([x+16, y+14], 'Emulsion module')
   db.draw_arrow([x+18, y+64], -4, 8, 3)
-  db.draw_text([x+13, y+80], 'Upstream')
-  db.draw_text([x+13, y+74], 'SSD')
+  if version == 1:
+    db.draw_text([x+13, y+80], 'Upstream')
+    db.draw_text([x+13, y+74], 'SSD')
+    db.draw_text([x+42, y+81], 'Downstream')
+    db.draw_text([x+42, y+75], 'SSD')
+  elif version == 2:
+    db.draw_text([x+13, y+74], 'SSD1')
+    db.draw_text([x+42, y+75], 'SSD2')
   db.draw_arrow([x+38, y+69], 2, 4, 3)
-  db.draw_text([x+42, y+81], 'Downstream')
-  db.draw_text([x+42, y+75], 'SSD')
   db.draw_arrow([18, y+43], 12, 6, 2, '', 0.8, 3)
   # nwave = int(60/10)
   # for i in range(nwave):
@@ -139,10 +145,14 @@ def draw():
   db.draw_text([x-dw/2, y+r+27], 'target')
   db.draw_text([x+ssdw1+air1+emw/2, y+2*r+8], 'Emulsion')
   db.draw_text([x+ssdw1+air1+emw/2, y+2*r+3], 'module')
-  db.draw_text([x+ssdw1/2-8, y+2*r+3], 'Upstream')
-  db.draw_text([x+ssdw1/2-8, y+2*r-2], 'SSD')
-  db.draw_text([x+ssdw1+air1+emw+air2, y+2*r+0], 'Downstream')
-  db.draw_text([x+ssdw1+air1+emw+air2, y+2*r-5], 'SSD')
+  if version == 1:
+    db.draw_text([x+ssdw1/2-8, y+2*r+3], 'Upstream')
+    db.draw_text([x+ssdw1/2-8, y+2*r-2], 'SSD')
+    db.draw_text([x+ssdw1+air1+emw+air2, y+2*r+0], 'Downstream')
+    db.draw_text([x+ssdw1+air1+emw+air2, y+2*r-5], 'SSD')
+  elif version == 2:
+    db.draw_text([x+ssdw1/2-8, y+2*r-2], 'SSD1')
+    db.draw_text([x+ssdw1+air1+emw+air2+ssdw2, y+2*r-6], 'SSD2')
   db.draw_arrow([x+ssdw1+air1+emw, y-2], 0, -8, 3)
   db.draw_arrow([x+ssdw1+air1, y-2], 0, -8, 3)
   db.draw_arrow([10, y-10], (x+ssdw1+air1)-10, 0, 3)

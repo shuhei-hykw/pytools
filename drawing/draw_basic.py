@@ -131,7 +131,7 @@ def draw_text_box(moveto, text, text_size=5.):
   if settings.target == 'MATRIX':
     w = settings.wmtx
     h = settings.hmtx
-  draw_square(moveto, w, h, 0.1, 0.95 if 'RM' in text else -1)
+  draw_square(moveto, w, h, 0.1, 0.95 if 'RM' in text else 1)
   print('0 setgray')
   print('/Times-Roman findfont {} scalefont setfont'.format(text_size))
   print('{} {} moveto'.format(moveto[0]+w/2, moveto[1]))
@@ -270,37 +270,44 @@ def draw_triangle(moveto, width, height, line_width=0.1, fill_color=1.0, rotate=
 #_______________________________________________________________________________
 def draw_logic_or(moveto, size=1.0, etcline=True):
   ''' draw AND logic '''
-  width = 3.0*size
-  height = 2.4*size
+  height = 1*size
+  r = height
+  w = height*(0.375+1-math.sqrt(3)/2)
   if etcline:
     for i in range(3):
-      draw_arrow([moveto[0]-width*0.3, moveto[1]+height*(0.8-i*0.1)], width*0.6, 0, 3)
-      draw_circle([moveto[0], moveto[1]+height*(0.5-i*0.1)], 0.04*size, 0.1)
+      draw_arrow([moveto[0]-size*0.3, moveto[1]+height*(0.8-i*0.1)],
+                 size*0.6, 0, 3)
+      draw_circle([moveto[0]-size*0.1, moveto[1]+height*(0.5-i*0.1)],
+                  0.01*size, 0.1)
   print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
-  for i in range(2):
-    width = width*0.3 if i == 1 else width
-    offset = width*0.2 if i == 0 else 0
-    print('{} {} {} {} {} {} curveto'.format(moveto[0]+width, moveto[1]+height*(1+i%2)/3-offset,
-                                             moveto[0]+width, moveto[1]+height*(2-i%2)/3+offset,
-                                             moveto[0], moveto[1]+height*(1-i%2)))
+  print('{} {} rlineto'.format(w, 0))
+  print('{} {} {} {} {} arc'.format(moveto[0]+w, moveto[1]+r, r, -90, -30))
+  print('{} {} {} {} {} arc'.format(moveto[0]+w, moveto[1], r, 30, 90))
+  print('{} {} rlineto'.format(-w, 0))
+  print('{} {} {} {} {} arcn'
+        .format(moveto[0]-r*math.sqrt(3)/2, moveto[1]+r/2, r, 30, -30))
   print('closepath gsave 1 setgray fill grestore 0 setgray 0.1 setlinewidth stroke')
 
 #_______________________________________________________________________________
 def draw_logic_and(moveto, size=1.0, etcline=False):
   ''' draw AND logic '''
-  width = 1.*size
-  height = 1.5*size
+  height = 1*size
+  r = height*0.5
+  w = height*0.75
   #moveto[1] = moveto[1] - 0.25*size
   moveto[1] = moveto[1] + 0.5*size
   if etcline:
     for i in range(3):
-      draw_arrow([moveto[0]-width*0.3, moveto[1]+height*(0.8-i*0.1)], width*0.6, 0, 3)
-      draw_circle([moveto[0]-width*0.15, moveto[1]+height*(0.5-i*0.1)], 0.04*size, 0.1)
-  print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
-  # print('{} {} {} {} {} {} curveto'.format(moveto[0]+width, moveto[1]+height*1/3,
-  #                                          moveto[0]+width, moveto[1]+height*2/3,
-  #                                          moveto[0], moveto[1]+height))
-  print('{} {} {} {} {} arc closepath'.format(moveto[0], moveto[1], height/2, -90, 90))
+      draw_arrow([moveto[0]-size*0.3, moveto[1]+height*(0.8-i*0.1)],
+                 size*0.6, 0, 3)
+      draw_circle([moveto[0]-size*0.15, moveto[1]+height*(0.5-i*0.1)],
+                  0.04*size, 0.1)
+  print('newpath {} {} moveto'.format(moveto[0], moveto[1]+r))
+  print('{} {} rlineto'.format(0, -height))
+  print('{} {} rlineto'.format(w, 0))
+  print('{} {} {} {} {} arc'.format(moveto[0]+w, moveto[1], r, -90, 90))
+  print('{} {} rlineto'.format(-w, 0))
+  print('closepath')
   print('gsave 1 setgray fill grestore 0 setgray 0.1 setlinewidth stroke')
 
 #_______________________________________________________________________________

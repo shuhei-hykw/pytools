@@ -83,7 +83,7 @@ def draw():
                  y+hframe[1]+yspace+aerogel[1]-1],
                 hframe[2]-aerogel[2]+4, 3, 3)
   db.draw_text([x+hframe[2]/2+28, y+height*0.9],
-               'Silica aerogel (n=1.05)')
+               'Silica aerogel (n=1.12)')
   db.draw_arrow([x+hframe[2]/2-2.5,
                  y+height*0.1+1.5], 6, 0, 3)
   db.draw_text([x+hframe[2]/2+18, y+height*0.1], 'Teflon mirror')

@@ -89,9 +89,15 @@ def draw():
   arc1.DrawArc(xstart-0.085, ystart+0.05, 0.02)
   arc1.SetFillColor(ROOT.kGray)
   arc1.DrawArc(xstart, ystart, 0.025)
+  wave = ROOT.TF1('wave', ('{} + {}*TMath::Sin(x*{})'
+                           .format(ystart, 0.01, 200, 1)),
+                  xstart+0.06, xstart+0.18)
+  wave.SetLineColor(ROOT.kBlack)
+  wave.Draw('same')
   t1.DrawLatexNDC(xstart-0.085, ystart+0.05, '#Xi^{-}')
   t1.SetTextFont(132)
   t1.DrawLatexNDC(xstart, ystart-0.10, '#Xi^{-}-atom')
+  t1.DrawLatexNDC(xstart+0.23, ystart, 'X-ray')
   t1.SetTextFont(12)
   a1.DrawArrow(xstart-0.14, ystart-0.05,
                xstart-0.25, ystart-0.11)

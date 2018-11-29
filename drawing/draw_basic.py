@@ -172,7 +172,9 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       else:
         if height < 10:
           moveto[0] += -3
-        if settings.target == 'PVAC' or settings.target == 'FAC':
+        if (settings.target == 'CASSETTE' or
+            settings.target == 'PVAC' or
+            settings.target == 'FAC'):
           moveto[0] += 2.5
         if settings.target == 'TOF':
           moveto[0] += 1
@@ -195,6 +197,9 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       moveto[0] += 4 + width
       draw_arrow(moveto, 4, 0, 1)
       moveto[0] += -width/2 + 3
+      if settings.target == 'CASSETTE':
+        moveto[0] += 1
+        # moveto[1] += 1
       if abs(round(rwidth) - rwidth) > 0.1:
         moveto[0] += -width/2 + 3
         # moveto[1] += -6

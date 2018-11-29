@@ -22,6 +22,7 @@ Supported targets are as follows.
  - SSD
  - DIAMOND
  - EMULSION
+ - CASSETTE
  - TRIGGER
  - MATRIX
  - DAQ
@@ -38,6 +39,7 @@ import draw_basic
 import draw_baryon_octet
 import draw_bc34
 import draw_bft
+import draw_cassette
 import draw_collimator
 import draw_daq
 import draw_diamond
@@ -58,7 +60,7 @@ import settings
 supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'FBH_MPPC', 'MPPC_CIRCUIT', 'PVAC', 'FAC', 'SDC1',
              'SCH', 'SCH_MPPC', 'SDC2', 'SDC3', 'TOF',
-             'SSD', 'DIAMOND', 'EMULSION',
+             'SSD', 'DIAMOND', 'EMULSION', 'CASSETTE',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT']
 
 #_______________________________________________________________________________
@@ -76,6 +78,8 @@ def draw_target():
     draw_diamond.draw()
   elif settings.target == 'EMULSION':
     draw_emulsion.draw()
+  elif settings.target == 'CASSETTE':
+    draw_cassette.draw()
   elif settings.target == 'TRIGGER':
     draw_trigger.draw()
   elif settings.target == 'MATRIX':

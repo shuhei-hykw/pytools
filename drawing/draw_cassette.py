@@ -31,8 +31,8 @@ def draw(top_view=False):
     if i == 4:
       db.draw_line_with_scale([x-s[0]/2, y+s[2]+s[1]-10], s[0], 0)
       db.draw_line_with_scale([x-s[0]/2+10, y+s[2]], 0, s[1], rotate=True)
-  db.draw_text([x+ss[0][0]/5, y+ss[-1][2]+6.5], 'Rubber sheet')
-  db.draw_text([x+ss[0][0]/5, y+ss[-1][2]+1.5], '(t=1)')
+  # db.draw_text([x+ss[0][0]/5, y+ss[-1][2]+6.5], 'Rubber sheet')
+  # db.draw_text([x+ss[0][0]/5, y+ss[-1][2]+1.5], '(t=1)')
   ''' M3 hole '''
   for i in range(6):
     db.draw_circle([x-73.2*scale*(2.5-i), y+15*scale],

@@ -123,7 +123,8 @@ def draw_text(moveto, text, rotate=False, text_size=5, font='Times-Roman', cente
 def draw_text_box(moveto, text, text_size=5.):
   ''' draw text box '''
   t = text.split()
-  w = (text_size*max(len(t[0]), len(t[1])) if len(t) > 1 else text_size*len(text))
+  w = (text_size*max(len(t[0]), len(t[1]))
+       if len(t) > 1 else text_size*len(text))
   h = text_size*9 if len(t) > 1 else text_size*2
   if settings.target == 'DAQ':
     w = settings.wdaq

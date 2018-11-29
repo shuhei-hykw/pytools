@@ -120,7 +120,10 @@ def draw():
     db.draw_arrow([x+5*l+2.75*dsize+1.125*ypitch, y+dsize-i*0.24*dsize], 1.8*dsize, 0, 3)
     db.draw_circle([x+5*l+3.65*dsize+1.125*ypitch, y+dsize-(i+3)*0.24*dsize], 0.04*dsize, 0.1)
   ''' HUL Matrix '''
-  db.draw_text_box([x+5*l+4.55*dsize+1.125*ypitch, y-dsize], 'HUL Matrix', dsize)
+  db.draw_square([x+5*l+4.55*dsize+1.125*ypitch, y-dsize], 30, 45)
+  db.draw_text([x+5*l+4.55*dsize+1.125*ypitch+15, y-dsize+26], 'Matrix')
+  db.draw_text([x+5*l+4.55*dsize+1.125*ypitch+15, y-dsize+18], 'coincidence')
+  # db.draw_text_box([x+5*l+4.55*dsize+1.125*ypitch, y-dsize], 'Matrix coincidence', dsize)
   #db.draw_text_box([x+5*l+7.55*dsize+0.75*ypitch, y-dsize], 'HUL Matrix', dsize)
   db.draw_arrow([x+5*l+10.55*dsize+1.125*ypitch, y+0.5*dsize+ypitch], 2*l+1.6*dsize-1.125*ypitch, 0, 3)
   db.draw_arrow([x+7*l+12.15*dsize, y+3.5*dsize], 0, 11.25*dsize, 3)

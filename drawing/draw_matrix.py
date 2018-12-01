@@ -104,7 +104,7 @@ def draw():
   db.draw_arrow([xstart+5*l+wmtx+0.625*ypitch,
                  ystart-5-1/6*ypitch-1/6*hmtx], 1*l, 0, 2)
   db.draw_text([xstart+5.5*l+wmtx+0.625*ypitch,
-                ystart-2-1/6*ypitch-1/6*hmtx], 'Accept', False, 5)
+                ystart-2-1/6*ypitch-1/6*hmtx], 'Trigger', False, 5)
   db.draw_arrow([xstart+(4-0.25*1.5)*l, ystart-5-13/6*ypitch],
                 0, 7/6*ypitch-1/4*hmtx, 3)
   db.draw_arrow([xstart+(4-0.25*1.5)*l, ystart-5-ypitch-1/4*hmtx],

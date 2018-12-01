@@ -78,8 +78,8 @@ def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0, 
     mf = [0.5*(m3[0] + m4[0]), 0.5*(m3[1] + m4[1])]
   else:
     mf = [moveto[0] + width, moveto[1] + height]
-  print('closepath gsave {} setgray fill grestore {} setlinewidth stroke'
-        .format(mfill, 0.0001 if mark != 3 else lw))
+  print('closepath gsave fill grestore {} setlinewidth stroke'
+        .format(0.0001 if mark != 3 else lw))
   if mark != 3:
     print('newpath {} {} moveto'.format(mi[0], mi[1]))
     print('{} {} rlineto'.format(mf[0] - mi[0], mf[1] - mi[1]))

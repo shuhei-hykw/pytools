@@ -4,6 +4,9 @@
 from settings import a4size, wdaq, hdaq
 import draw_basic as db
 
+#pc = 'PC'
+pc = 'server'
+
 #_______________________________________________________________________________
 def draw():
   scale = 1.0
@@ -54,7 +57,7 @@ def draw():
   x = a4size[0] - 80
   y = ystart - 3/4*hdaq
   ''' vme01 '''
-  db.draw_text_box([x, y], 'XVB601')
+  db.draw_text_box([x, y], 'GE XVB601')
   y -= hdaq
   db.draw_text_box([x, y], 'VME RM')
   db.draw_arrow([x-w1, y+0.5*hdaq], w1, 0, 3, ctrig)
@@ -62,11 +65,11 @@ def draw():
   db.draw_arrow([x-w2, y+0.25*hdaq], w2, 0, 2, cbusy)
   db.draw_arrow([x-w2, y+0.25*hdaq], 0, -23/12*hdaq, 3, cbusy)
   y -= hdaq
-  db.draw_text_box([x, y], 'QDC CAEN V792')
+  db.draw_text_box([x, y], 'ADC CAEN V792')
   db.draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, ctrig)
   db.draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
   y -= hdaq
-  db.draw_text_box([x, y], 'HRTDC CAEN V775')
+  db.draw_text_box([x, y], 'TDC CAEN V775')
   db.draw_square([x+wdaq, y], 10, 4*hdaq)
   db.draw_arrow([x-w1, y+2/3*hdaq], w1, 0, 2, ctrig)
   db.draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
@@ -78,7 +81,7 @@ def draw():
   db.draw_text([x+wdaq+25, y+2*hdaq], 'VME bus', True)
   ''' vme04 '''
   y -= 1.5*hdaq
-  db.draw_text_box([x, y], 'XVB601')
+  db.draw_text_box([x, y], 'GE XVB601')
   y -= hdaq
   db.draw_text_box([x, y], 'VME RM')
   db.draw_arrow([x-wtag, y+3/4*hdaq], wtag, 0, 2, ctag)
@@ -93,7 +96,7 @@ def draw():
   db.draw_arrow([x-(3*w1 + wctrl - 0.5*hdaq if flag_tof else w1), y+2/3*hdaq],
              (3*w1 + wctrl - 0.5*hdaq if flag_tof else w1), 0, 2, ctrig)
   if flag_tof:
-    db.draw_text([x-(7*w1 + wctrl), y+3/6*hdaq-1.8], 'TOF')
+    db.draw_text([x-(7*w1 + wctrl), y+3/6*hdaq-1.5], 'TOF')
     db.draw_arrow([x-(4*w1 + wctrl), y+5/6*hdaq], w1, 0, 3, ctrig)
     db.draw_arrow([x-(6*w1 + wctrl), y+3/6*hdaq], 3*w1, 0, 3)
     db.draw_logic_and([x-(3*w1 + wctrl), y+2/6*hdaq], hdaq/1.5)
@@ -107,7 +110,7 @@ def draw():
   db.draw_text([x+wdaq+25, y+1.5*hdaq], 'VME bus', True)
   ''' vme07 '''
   y -= 1.5*hdaq
-  db.draw_text_box([x, y], 'XVB601')
+  db.draw_text_box([x, y], 'GE XVB601')
   y -= hdaq
   db.draw_text_box([x, y], 'VME RM')
   db.draw_arrow([x-wtag, y+3/4*hdaq], wtag, 0, 2, ctag)
@@ -128,7 +131,7 @@ def draw():
   db.draw_text([x+wdaq+25, y+1.5*hdaq], 'VME bus', True)
   ''' COPPER '''
   y -= 1.5*hdaq
-  db.draw_text_box([x, y], 'Front-end PC')
+  db.draw_text_box([x, y], 'Front-end {}'.format(pc))
   y -= hdaq
   db.draw_text_box([x, y], 'VME RM')
   db.draw_arrow([x-wtag, y+2/4*hdaq], wtag, 0, 2, ctag)
@@ -155,7 +158,7 @@ def draw():
   db.draw_text([x+wdaq+21.7, y+1*hdaq], 'J0 bus', True)
   ''' EASIROC '''
   y -= 1.5*hdaq
-  db.draw_text_box([x, y], 'Front-end PC')
+  db.draw_text_box([x, y], 'Front-end {}'.format(pc))
   y -= hdaq
   db.draw_text_box([x, y], 'EASIROC')
   db.draw_arrow([x-wctrl, y+9/5*hdaq], wctrl, 0, 2, cctrl)
@@ -174,7 +177,7 @@ def draw():
   # y -= hdaq
   # db.draw_text_box([x, y], 'VME RM')
   y -= 1.5*hdaq
-  db.draw_text_box([x, y], 'EM controller PC')
+  db.draw_text_box([x, y], 'EM control {}'.format(pc))
   db.draw_arrow([x-wctrl, y+3/4*hdaq], wctrl, 0, 2, cctrl)
   db.draw_arrow([x-wdata, y+1/2*hdaq], wdata, 0, 3, cdata)
   ''' HUL MATRIX '''
@@ -203,7 +206,7 @@ def draw():
   db.draw_arrow([x-w2, y+1/3*hdaq], w2, 0, 3, cbusy)
   ''' HUL SCALER '''
   y -= 1.5*hdaq
-  db.draw_text_box([x, y], 'Front-end PC')
+  db.draw_text_box([x, y], 'Front-end {}'.format(pc))
   db.draw_arrow([x-wctrl, y+4/5*hdaq], wctrl, 0, 2, cctrl)
   db.draw_arrow([x-wdata, y+3/5*hdaq], wdata, 0, 3, cdata)
   db.draw_arrow([x-w1, y+2/5*hdaq], w1, 0, 3, cctrl)
@@ -221,7 +224,7 @@ def draw():
   ''' EB '''
   x = 15
   y = ystart - 8*ypitch if flag_tof else ystart - 7*ypitch
-  db.draw_text([x+0.5*wdaq, y+3], 'Main DAQ computer')
+  db.draw_text([x+0.5*wdaq, y+3], 'Main DAQ {}'.format(pc))
   for i, name in enumerate(['Controller', 'Event builder', 'Event distributer', 'Recorder']):
     db.draw_text_box([x, y-(i+1)*hdaq], name)
     db.draw_arrow([x+wdaq, y-(i+(1/2 if i == 0 else 1/4 if i == 1 else 1/3))*hdaq],

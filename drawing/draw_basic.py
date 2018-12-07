@@ -86,12 +86,13 @@ def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0, 
     print('closepath gsave fill grestore {} setlinewidth stroke'.format(lw))
 
 #_______________________________________________________________________________
-def draw_elip(moveto, r, ratio, theta=0, fill_color=1.0, line_width=0.1):
+def draw_elip(moveto, r, ratio, theta=0, fill_color=1.0, line_width=0.1,
+              begin=0, end=360):
   print('/cmtx matrix currentmatrix def')
   print('gsave {} {} translate {} rotate {} setlinewidth'
         .format(moveto[0], moveto[1], theta, line_width))
-  print('newpath 1.0 {} scale 0 0 {} 0 360 arc'.format(ratio, r))
-  print('cmtx setmatrix closepath stroke grestore')
+  print('newpath 1.0 {} scale 0 0 {} {} {} arc'.format(ratio, r, begin, end))
+  print('cmtx setmatrix stroke closepath grestore')
 
 #_______________________________________________________________________________
 def draw_circle(moveto, r, fc=1.0, a=0, b=360, lw=0.1):

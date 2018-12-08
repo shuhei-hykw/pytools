@@ -8,9 +8,9 @@ import draw_basic as db
 def draw():
   scale = 1.0
   stage = 3
-  x_microscope = 15
+  x_microscope = 10
   y_microscope = 50
-  w_microscope = 75*scale
+  w_microscope = 65*scale
   h_microscope = 20*scale
   x_server = 155
   y_server = 50
@@ -18,38 +18,40 @@ def draw():
   h_server = 20*scale
   x_driver = x_microscope+w_microscope+10
   y_driver = y_microscope
-  w_driver = x_server - x_microscope - w_microscope - 20
+  w_driver = x_server - x_microscope - w_microscope - 30
   h_driver = 20*scale
+  text_size1 = 4.5
+  text_size2 = 6.0
   '''microscope'''
   x = x_microscope
   y = y_microscope
   w = w_microscope
   h = h_microscope
   db.draw_square([x-5, y-5], w+10, 6*h, fill_color=0.9)
-  db.draw_text([x+w/2, y+h*6+3-5], 'Microscope', text_size=7)
+  db.draw_text([x+w/2, y+h*6+3-5], 'Microscope', text_size=text_size2)
   ''' position encoder '''
   db.draw_square([x, y], w, h)
-  db.draw_text([x, y+h+3], 'Position encoder', centering=False)
-  db.draw_text([x+w/2, y+h*0.7-1.5], 'Haldenhain LS406 (x/y)')
-  db.draw_text([x+w/2, y+h*0.3-1.5], 'Haldenhain MT2501 (z)')
+  db.draw_text([x, y+h+3], 'Position encoder', centering=False, text_size=text_size1)
+  db.draw_text([x+w/2, y+h*0.7-1.5], 'Haldenhain LS406 (x/y)', text_size=text_size1)
+  db.draw_text([x+w/2, y+h*0.3-1.5], 'Haldenhain MT2501 (z)', text_size=text_size1)
   ''' stepping motor '''
   y += 1.75*h
   db.draw_square([x, y], w, h)
-  db.draw_text([x, y+h+3], 'Stepping motor', centering=False)
+  db.draw_text([x, y+h+3], 'Stepping motor', centering=False, text_size=text_size1)
   # db.draw_text([x+w/2, y+h*0.7-1.5], 'Oriental motor')
   # db.draw_text([x+w/2, y+h*0.3-1.5], 'PK566-NBC (x/y) PK543-NBC (z)')
-  db.draw_text([x+w/2, y+h*0.7-1.5], 'Oriental motor PK566-NBC (x/y)')
-  db.draw_text([x+w/2, y+h*0.3-1.5], 'Oriental motor PK543-NBC (z)')
+  db.draw_text([x+w/2, y+h*0.7-1.5], 'Oriental motor PK566-NBC (x/y)', text_size=text_size1)
+  db.draw_text([x+w/2, y+h*0.3-1.5], 'Oriental motor PK543-NBC (z)', text_size=text_size1)
   ''' LED '''
   y += 1.75*h
   db.draw_square([x, y], w, h/2)
-  db.draw_text([x, y+h/2+3], 'LED', centering=False)
-  db.draw_text([x+w/2, y+h/4-1.5], 'LUXEON (5W)')
+  db.draw_text([x, y+h/2+3], 'LED', centering=False, text_size=text_size1)
+  db.draw_text([x+w/2, y+h/4-1.5], 'LUXEON (5W)', text_size=text_size1)
   ''' CCD '''
   y += 1.25*h
   db.draw_square([x, y], w, h/2)
-  db.draw_text([x, y+h/2+3], 'CCD', centering=False)
-  db.draw_text([x+w/2, y+h/4-1.5], 'SONY XC-HR300')
+  db.draw_text([x, y+h/2+3], 'CCD', centering=False, text_size=text_size1)
+  db.draw_text([x+w/2, y+h/4-1.5], 'SONY XC-HR300', text_size=text_size1)
   ''' server '''
   x = x_server
   y = y_server
@@ -58,17 +60,17 @@ def draw():
   db.draw_square([x-5, y-5+1.75*h], w+10, 4.25*h, fill_color=0.9)
   #db.draw_square([x-5, y-5], w+10, 6*h, fill_color=0.9)
   #db.draw_text([x+w/2, y+h*6+3-5], 'Control server (Windows 7)')
-  db.draw_text([x+w/2, y+h*6+3-5], 'Control server', text_size=7)
+  db.draw_text([x+w/2, y+h*6+3-5], 'Control server', text_size=text_size2)
   ''' Mortor controll board '''
   y += 2*h
   db.draw_square([x, y], w, h/2)
-  db.draw_text([x, y+h*0.5+3], 'Mortor control board', centering=False)
-  db.draw_text([x+w/2, y+h*0.25-1.5], 'ADTEK aPCI-M59')
+  db.draw_text([x, y+h*0.5+3], 'Mortor control board', centering=False, text_size=text_size1)
+  db.draw_text([x+w/2, y+h*0.25-1.5], 'ADTEK aPCI-M59', text_size=text_size1)
   ''' Image processing board '''
   y += 2.75*h
   db.draw_square([x, y], w, h/2)
-  db.draw_text([x, y+h/2+3], 'Image processing board', centering=False)
-  db.draw_text([x+w/2, y+h/4-1.5], 'Renesas VP-910')
+  db.draw_text([x, y+h/2+3], 'Image processing board', centering=False, text_size=text_size1)
+  db.draw_text([x+w/2, y+h/4-1.5], 'Renesas VP-910', text_size=text_size1)
   ''' driver '''
   x = x_driver
   y = y_driver
@@ -76,10 +78,12 @@ def draw():
   h = h_driver
   ''' interpolate digitizer '''
   db.draw_square([x, y+0.2*h], w, 0.6*h)
-  db.draw_text([x+w/2, y+0.5*h-1.5], 'Interpolate-digitizer')
-  db.draw_arrow([x-10, y+0.5*h], 10, 0, 3, msize=2)
-  db.draw_arrow([x+w-5, y+0.8*h], 0, 1.35*h, 3, msize=2)
-  db.draw_arrow([x+w-5, y+2.15*h], 15, 0, 2, msize=2)
+  db.draw_text([x, y+0.8*h+3], 'Interpolate-digitizer', text_size=text_size1, centering=False)
+  db.draw_text([x+w/2, y+0.5*h-1.5], 'Haldenhain EXE 602E', text_size=text_size1)
+  db.draw_arrow([x-10, y+0.5*h], 10, 0, 2, msize=2)
+  db.draw_arrow([x+w, y+0.5*h], 5, 0, 3, msize=2)
+  db.draw_arrow([x+w+5, y+0.5*h], 0, 1.65*h, 3, msize=2)
+  db.draw_arrow([x+w+5, y+2.15*h], 15, 0, 2, msize=2)
   # db.draw_text([x+w/2, y+0.7*h-1.5], 'Interpolatation and')
   # db.draw_text([x+w/2, y+0.3*h-1.5], 'digitizing electronics')
   # db.draw_arrow([x+w-5, y+h], 0, 1.15*h, 3, msize=2)
@@ -90,9 +94,10 @@ def draw():
   # db.draw_text([x+w/3, y+0.05*h-1.5], 'and digitize', text_size=4)
   ''' mortor driver '''
   y += 1.75*h
-  w -= 10*scale
+  # w -= 10*scale
   db.draw_square([x, y+0.2*h], w, h*0.6)
-  db.draw_text([x+w/2, y+0.5*h-1.5], 'Motor driver')
+  db.draw_text([x, y+0.8*h+3], 'Motor driver', text_size=text_size1, centering=False)
+  db.draw_text([x+w/2, y+0.5*h-1.5], 'Oriental motor DFU1514', text_size=text_size1)
   db.draw_arrow([x-10, y+0.5*h], 10, 0, 1, msize=2)
   # db.draw_arrow([x+w/2, y+0.2*h], 0, -0.43*h, 3, msize=2)
   db.draw_arrow([x+w, y+0.6*h], 20, 0, 0, msize=2)
@@ -103,10 +108,10 @@ def draw():
   db.draw_square([x, y+0.2*h], w, h*0.6)
   db.draw_text([x+w/2, y+0.5*h-1.5], 'LED driver')
   db.draw_arrow([x-10, y+0.5*h], 10, 0, 1, msize=2)
-  db.draw_arrow([x+w, y+0.5*h], 18, 0, 1, msize=2)
+  db.draw_arrow([x+w, y+0.5*h], 18, 0, 0, msize=2)
   db.draw_arrow([x-10, y+1.75*h], 30+w, 0, 0, msize=2)
   db.draw_arrow([x+w*0.2, y+0.8*h], 0, 0.95*h, 1, msize=2)
-  db.draw_text([x+w*0.6, y+(0.8+0.95/2)*h-1.5], 'synchronize')
+  db.draw_text([x+w*0.2+2, y+(0.8+0.95/2)*h-1.5], 'synchronize', centering=False)
   # db.draw_text([x+w+9, y+(0.5)*h+5], 'Serial', text_size=4)
   # db.draw_text([x+w+9, y+(0.5)*h+1], 'to USB', text_size=4)
   db.draw_text([x+w+10+10, y+0.5*h-1.5], 'on-board USB', centering=False)

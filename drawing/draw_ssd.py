@@ -7,11 +7,11 @@ import settings
 #_______________________________________________________________________________
 def draw():
   unit = 1e0
-  scale = 0.04*unit
+  scale = 0.036*unit
   settings.set_scale(scale)
   width = 10*345*scale
   #height = 10*350*scale
-  height = 40
+  height = 1000*scale
   sensor = {}
   sensor['thickness'] = 320*scale/unit
   sensor['spacing'] = 500*scale/unit
@@ -42,7 +42,7 @@ def draw():
     x += sensor['spacing']
   db.draw_text([(xstart+x-space)/2, y-5], 'SSD1')
   db.draw_arrow([xstart-5, y+height/2], x-xstart-space+10, 0, 2)
-  db.draw_text([x, y+height/2+3], 'Beam')
+  db.draw_text([x+2, y+height/2+3], 'Beam')
   ''' SSD2 '''
   xstart = x + 30
   x = xstart
@@ -62,5 +62,5 @@ def draw():
     x += sensor['spacing']
   db.draw_text([(xstart+x-space)/2, y-5], 'SSD2')
   db.draw_arrow([xstart-5, y+height/2], x-xstart-space+10, 0, 2)
-  db.draw_text([x, y+height/2+3], 'Beam')
-  db.draw_text([x+15, y-5], '[um]')
+  db.draw_text([x+2, y+height/2+3], 'Beam')
+  db.draw_text([x+2, y-5], '[um]')

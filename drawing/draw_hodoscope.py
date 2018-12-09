@@ -5,6 +5,8 @@ import draw_basic as db
 from settings import a4size, line_width
 import settings
 
+draw_unit = False
+
 #_______________________________________________________________________________
 def draw(scintillator, pmt, light_guide, label_position, scale_height,
          full_width, wave=None, beam=None, with_dash=False, label_abc='',
@@ -14,6 +16,8 @@ def draw(scintillator, pmt, light_guide, label_position, scale_height,
   has_pmt = (True if settings.target == 'BH1' or settings.target == 'BH2'
              or settings.target == 'TOF' else False)
   mizo = (pmt['width']-light_guide['width'])/2 #if has_pmt else 0
+  if settings.target == 'SCH':
+    a4size[0] += 55
   '''front view'''
   ycenter = (a4size[1] - pmt['height']*2 - light_guide['height']*2 - 10
              if settings.target == 'BH1' else
@@ -127,7 +131,7 @@ def draw(scintillator, pmt, light_guide, label_position, scale_height,
       db.draw_text([(a4size[0]+110*settings.scale)/2+5,
                     ycenter+2.5*settings.scale-4.5], 'Frame window')
       db.draw_line_with_scale([(a4size[0]-110*settings.scale)/2,
-                               ycenter+2.5*settings.scale], -10,
+                               ycenter+2.5*settings.scale], -5,
                               30*settings.scale,
                               rotate=True)
     if settings.target == 'SCH':
@@ -232,7 +236,7 @@ def draw(scintillator, pmt, light_guide, label_position, scale_height,
                          *pmt['width']+mizo, y],
                      light_guide['width'], 0, 3)
       db.draw_line_with_scale([(a4size[0] - total_width)/2, ycenter],
-                              -10, scintillator['height'], True)
+                              -5, scintillator['height'], True)
     db.draw_text([a4size[0]/2 - len(light_guide['segments'])/2*pmt['width']
                   + pmt['label'][0],
                   ycenter + scintillator['height'] + light_guide['height']
@@ -338,7 +342,7 @@ def draw(scintillator, pmt, light_guide, label_position, scale_height,
       continue
     if i == 0:
       db.draw_line_with_scale([x, ycenter + scintillator['zdiff']*(1-i%2)],
-                              -10, scintillator['thickness'], True)
+                              -5, scintillator['thickness'], True)
     db.draw_line_with_scale([x, ycenter + scintillator['zdiff']*(1-i%2)],
                             scintillator['widths'][i],
                             ((-scale_height[0]*(i%2-0.5))
@@ -387,8 +391,9 @@ def draw(scintillator, pmt, light_guide, label_position, scale_height,
     db.draw_text([a4size[0]/2, ycenter + label_position['up']], 'Upstream')
   if 'down' in label_position:
     db.draw_text([a4size[0]/2, ycenter + label_position['down']], 'Downstream')
-  db.draw_text([(a4size[0] + total_width)/2 + label_position['unit'][0],
-                ycenter + label_position['unit'][1]], '[mm]')
+  if draw_unit:
+    db.draw_text([(a4size[0] + total_width)/2 + label_position['unit'][0],
+                  ycenter + label_position['unit'][1]], '[mm]')
 
 #_______________________________________________________________________________
 def draw_bh1(scale=0.5):
@@ -524,7 +529,7 @@ def draw_sch(scale=0.2):
   draw(scintillator, pmt, light_guide, label_position, scale_height, full_width, beam=beam, front_draw=True)
 
 #_______________________________________________________________________________
-def draw_tof(scale=0.08):
+def draw_tof(scale=0.06):
   settings.set_scale(scale)
   scintillator = {}
   pmt = {}
@@ -533,19 +538,19 @@ def draw_tof(scale=0.08):
   scintillator['thickness'] = 30*scale
   scintillator['widths'] = [80*scale for i in range(24)]
   scintillator['name'] = 'Scintillator EJ-200'
-  scintillator['label'] = [-93, 2]
+  scintillator['label'] = [-1280*scale, 50*scale]
   scintillator['height'] = 1800*scale
   scintillator['overlap'] = 5*scale
   scintillator['zdiff'] = -scintillator['thickness']
   pmt['width'] = 60*scale
   pmt['height'] = 235*scale
   pmt['name'] = 'PMT H1949'
-  pmt['label'] = [-86, -4]
+  pmt['label'] = [-1160*scale, -4*scale]
   light_guide['width'] = 55*scale
   light_guide['height'] = 160*scale
   light_guide['neck'] = 20*scale
   light_guide['segments'] = []
-  light_guide['label'] = [-92, 140]
+  light_guide['label'] = [-1260*scale, 1800*scale]
   label_position['unit'] = [15, -15]
   # label_position['up'] = -15
   # label_position['down'] = 18 + 30*scale*2

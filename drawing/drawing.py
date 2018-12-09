@@ -27,6 +27,7 @@ Supported targets are as follows.
  - MATRIX
  - DAQ
  - MICROSCOPE
+ - PATTERN
  - SU3
  - OCTET
 '''
@@ -50,6 +51,7 @@ import draw_hodoscope
 import draw_matrix
 import draw_microscope
 import draw_mppc
+import draw_pattern_match
 import draw_product
 import draw_pvac
 import draw_sdc123
@@ -63,7 +65,8 @@ supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'FBH_MPPC', 'MPPC_CIRCUIT', 'PVAC', 'FAC', 'SDC1',
              'SCH', 'SCH_MPPC', 'SDC2', 'SDC3', 'TOF',
              'SSD', 'DIAMOND', 'EMULSION', 'CASSETTE', 'MICROSCOPE',
-             'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT']
+             'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT',
+             'PATTERN']
 
 #_______________________________________________________________________________
 no_view_label = True
@@ -124,6 +127,8 @@ def draw_target():
     draw_product.draw()
   elif settings.target == 'MICROSCOPE':
     draw_microscope.draw()
+  elif settings.target == 'PATTERN':
+    draw_pattern_match.draw()
 
 #_______________________________________________________________________________
 def draw():

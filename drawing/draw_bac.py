@@ -7,6 +7,8 @@ import draw_basic as db
 from settings import a4size, line_width
 import settings
 
+draw_unit = False
+
 #_______________________________________________________________________________
 def draw(top_view=False):
   scale = 0.5
@@ -36,6 +38,8 @@ def draw(top_view=False):
   db.draw_line_with_scale([x-width/2, y], -16, height, True)
   db.draw_line_with_scale([x-width/2, y+(height-window[1])/2],
                           -5, window[1], True)
+  db.draw_arrow([x+width/2-1, y+6], 4, -4, 3)
+  db.draw_text([x+width/2+4, y-1], 'Edge frame', centering=False)
   db.draw_arrow([x-pmt[0]/2, y-pmt[1]+2], 4, -4, 3)
   db.draw_arrow([x+pmt[0]/2, y-pmt[1]+2], -4, -4, 3)
   db.draw_text([x, y-pmt[1]-6], 'PMT R6683')
@@ -53,10 +57,13 @@ def draw(top_view=False):
   db.draw_arrow([x-2, y+height-6], 6, 4, 3)
   db.draw_text([x+t1/2+17, y+height-1], 'Silica aerogel (n=1.03)')
   db.draw_arrow([x+t1/2+6.5, y+8], 3, 0, 3)
-  db.draw_text([x+t1/2+24, y+6.5], 'Teflon mirror')
+  db.draw_text([x+t1/2+11, y+6.5], 'Teflon refrector', centering=False)
   db.draw_arrow([x-t2/2-5, y+height/2], t2+10, 0, 2)
+  db.draw_arrow([x, y-pmt[1]+2], 0, -4, 3)
+  db.draw_text([x, y-pmt[1]-6], 'PMT R6683')
   db.draw_text([x+t2/2, y+height/2+2], 'Beam')
-  db.draw_text([x+t2/2+15, y-pmt[1]-6], '[mm]')
+  if draw_unit:
+    db.draw_text([x+t2/2+15, y-pmt[1]-6], '[mm]')
   '''top view'''
   if not top_view:
     return

@@ -37,4 +37,4 @@ def draw(scale=8.0, track=False):
   db.draw_line_with_scale([xcenter-width/2, ycenter+1.5*wire_spacing[1]], wire_spacing[0], 10)
   db.draw_line_with_scale([xcenter-width/2+wire_spacing[0]*3, ycenter+1.5*wire_spacing[1]],
                           -6, wire_spacing[1]/2, True)
-  db.draw_text([xcenter+width/2, ycenter-wire_spacing[1]/4], '[mm]')
+  # db.draw_text([xcenter+width/2, ycenter-wire_spacing[1]/4], '[mm]')

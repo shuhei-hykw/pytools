@@ -58,9 +58,10 @@ def draw(scale, wire_spacing, shield_wire=None, track=False, abc_label=True):
                   ycenter+3.5*r+shield_wire[1]-1],
                   #ycenter-shield_wire[1]-1],
                  'Shield wire', centering=False)
-    db.draw_text([xcenter+width/2+r*3.5, ycenter-shield_wire[1]-6], '[mm]')
+    # db.draw_text([xcenter+width/2+r*3.5, ycenter-shield_wire[1]-6], '[mm]')
   else:
-    db.draw_text([xcenter+width/2+r*3.5, ycenter-wire_spacing/2], '[mm]')
+    pass
+    # db.draw_text([xcenter+width/2+r*3.5, ycenter-wire_spacing/2], '[mm]')
   if track:
     db.draw_text([xcenter+wire_spacing/4+22, ycenter+r*4.5], 'Charged particle')
     db.draw_arrow([xcenter+wire_spacing/8, ycenter-r], wire_spacing/4, 5.5*r, 2)

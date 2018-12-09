@@ -54,9 +54,14 @@ def draw():
                           aerogel[0], -10)
   db.draw_line_with_scale([x-aerogel[0]/2, y+hframe[1]+yspace],
                           10, aerogel[1], True)
-  db.draw_arrow([(a4size[0]-pmt[0])/2+xoffset, a4size[1]/2-pmt[1]+2], 4, -4, 3)
-  db.draw_arrow([(a4size[0]+pmt[0])/2+xoffset, a4size[1]/2-pmt[1]+2], -4, -4, 3)
-  db.draw_text([x, y-pmt[1]-6], 'PMT R6682')
+  db.draw_arrow([x-pmt_dist/2,y-pmt[1]+2], 0, -4, 3)
+  db.draw_text([x-pmt_dist/2, y-pmt[1]-6], 'PMT R6682')
+  # db.draw_arrow([(a4size[0]-pmt[0])/2+xoffset, a4size[1]/2-pmt[1]+2], 4, -4, 3)
+  # db.draw_arrow([(a4size[0]+pmt[0])/2+xoffset, a4size[1]/2-pmt[1]+2], -4, -4, 3)
+  # db.draw_text([x, y-pmt[1]-6], 'PMT R6682')
+  # db.draw_arrow([(a4size[0]-pmt[0])/2+xoffset, a4size[1]/2+pmt[1]+height-2], 4, 4, 3)
+  # db.draw_arrow([(a4size[0]+pmt[0])/2+xoffset, a4size[1]/2+pmt[1]+height-2], -4, 4, 3)
+  # db.draw_text([x, y+pmt[1]+height+3], 'PMT R6682')
   db.draw_text([x+aerogel[0]*0.2-12, y+hframe[1]+vframe[1]/2-1.5], 'Beam')
   db.draw_beam_mark([x+aerogel[0]*0.2, y+hframe[1]+vframe[1]/2], 5)
   x += 90
@@ -79,14 +84,18 @@ def draw():
   db.draw_line_with_scale([x-hframe[2]/2,
                            y+hframe[1]+(vframe[1]+aerogel[1])/2],
                           aerogel[2], -10)
+  # db.draw_arrow([x, y-pmt[1]+2], 0, -4, 3)
+  # db.draw_text([x, y-pmt[1]-6], 'PMT R6682')
+  # db.draw_arrow([x, y+pmt[1]+height+2], 0, -4, 3)
+  # db.draw_text([x, y+pmt[1]+height+3], 'PMT R6682')
   db.draw_arrow([x-hframe[2]/2+aerogel[2]-1,
                  y+hframe[1]+yspace+aerogel[1]-1],
                 hframe[2]-aerogel[2]+4, 3, 3)
-  db.draw_text([x+hframe[2]/2+28, y+height*0.9],
-               'Silica aerogel (n=1.12)')
+  db.draw_text([x+hframe[2]/2+4, y+height*0.9],
+               'Silica aerogel (n=1.12)', centering=False)
   db.draw_arrow([x+hframe[2]/2-2.5,
                  y+height*0.1+1.5], 6, 0, 3)
-  db.draw_text([x+hframe[2]/2+18, y+height*0.1], 'Teflon mirror')
+  db.draw_text([x+hframe[2]/2+4, y+height*0.1], 'Teflon reflector', centering=False)
   db.draw_arrow([x-hframe[2]/2-5, y+height/2-6], hframe[2]+10, 0, 2)
-  db.draw_text([x+hframe[2]/2+8, y+height/2-3], 'Beam')
-  db.draw_text([x+hframe[2]/2+30, y-pmt[1]-6], '[mm]')
+  db.draw_text([x+hframe[2]/2+4, y+height/2-3], 'Beam', centering=False)
+  # db.draw_text([x+hframe[2]/2+30, y-pmt[1]-6], '[mm]')

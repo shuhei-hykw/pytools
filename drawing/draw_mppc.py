@@ -8,6 +8,22 @@ from settings import a4size, line_width
 import settings
 
 #_______________________________________________________________________________
+def draw_uF(x, y, val, tsize=4.5):
+  db.draw_text([x, y], str(val), centering=False, text_size=tsize)
+  x += len(str(val))*tsize*0.5
+  db.draw_text([x, y], 'm', centering=False, font='Symbol', text_size=tsize)
+  db.draw_text([x+tsize*0.6, y], 'F', centering=False, text_size=tsize)
+
+#_______________________________________________________________________________
+def draw_Ohm(x, y, val, tsize=4.5):
+  db.draw_text([x, y], str(val), centering=False, text_size=tsize)
+  if val == 100:
+    x += len(str(val))*tsize*0.52
+  else:
+    x += len(str(val))*tsize*0.4
+  db.draw_text([x, y], 'W', centering=False, font='Symbol', text_size=tsize)
+
+#_______________________________________________________________________________
 def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
   xstart = (settings.a4size[0] - board['width'])/2
   ystart = 200
@@ -107,7 +123,7 @@ def draw(board, mppc, hole, gnd, connector, sma, label='(a)'):
   db.draw_text([xstart+hole['position'][-1][0],
                 ystart-5], 'Through hole')
   db.draw_text([xstart-12, ystart+board['height']/2], 'Back', rotate=True)
-  db.draw_text([xstart+board['width']+10, ystart-16], '[mm]')
+  # db.draw_text([xstart+board['width']+10, ystart-16], '[mm]')
 
 
 #_______________________________________________________________________________
@@ -118,6 +134,7 @@ def draw_circuit(scale=1, label='(b)'):
   if len(label) > 0:
     db.draw_text([x, y+20], label, text_size=8)
   db.draw_text([x, y+2], 'Bias input')
+  draw_uF(x-l, y+2-2.*l, 1)
   db.draw_arrow([x, y], 0, -2*l, 3)
   db.draw_circle([x, y-l], 1, fc=0)
   db.draw_arrow([x-l/2, y-2*l], l, 0, 3)
@@ -131,9 +148,17 @@ def draw_circuit(scale=1, label='(b)'):
       db.draw_arrow([x+2*l, y], 0, -3*l, 3)
       db.draw_text([x+7*l, y+0.5*l+4], 'MPPC')
       db.draw_text([x+15*l+6, y-1.5], 'Output 1')
+      draw_Ohm(x+3*l+1, y+3, '1 k')
+      draw_uF(x+5.5*l, y-1*l+1, 0.1)
+      draw_Ohm(x+10*l, y-1.5*l+3, 100)
+      draw_uF(x+11.5*l, y-1*l+1, 0.1)
     elif i == 1:
       db.draw_arrow([x+2*l, y], 0, -2*l, 3)
       db.draw_text([x+15*l+6, y-1.5], 'Output 2')
+      draw_Ohm(x+3*l+1, y+3, '1 k')
+      draw_uF(x+5.5*l, y-1*l+1, 0.1)
+      draw_Ohm(x+10*l, y-1.5*l+3, 100)
+      draw_uF(x+11.5*l, y-1*l+1, 0.1)
     elif i == 2:
       print('0 setgray [1 1] 0 setdash')
       print('newpath {} {} moveto'.format(x+2*l, y-2*l))
@@ -148,6 +173,10 @@ def draw_circuit(scale=1, label='(b)'):
     elif i == 3:
       db.draw_arrow([x+2*l, y], 0, l, 3)
       db.draw_text([x+15*l+7, y-1.5], 'Output 16')
+      draw_Ohm(x+3*l+1, y+3, '1 k')
+      draw_uF(x+5.5*l, y-1*l+1, 0.1)
+      draw_Ohm(x+10*l, y-1.5*l+3, 100)
+      draw_uF(x+11.5*l, y-1*l+1, 0.1)
     db.draw_arrow([x+2*l, y], l, 0, 3)
     db.draw_circle([x+2*l, y], 1, fc=0)
     db.draw_square([x+3*l, y-0.15*l], l, 0.3*l)

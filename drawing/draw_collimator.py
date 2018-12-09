@@ -7,11 +7,12 @@ import draw_basic as db
 from settings import a4size, line_width
 import settings
 
-version = 2017
+version = 2016
+#version = 2017
 
 #_______________________________________________________________________________
 def draw():
-  scale = 0.2
+  scale = 0.17
   settings.set_scale(scale)
   t = 400*scale
   t_tan = 200*scale
@@ -28,7 +29,7 @@ def draw():
   lead = [100*scale, 50*scale, 200*scale, 0.8]
   fcolor = 0.95
   unit_position = [a4size[0]-100*scale+open_tan[0], a4size[1]/2-20]
-  db.draw_text(unit_position, '[mm]')
+  # db.draw_text(unit_position, '[mm]')
   # front view
   xoffset = (a4size[0]-width)/2-45
   yoffset = a4size[1]/2 + t_tan - height[0]/2 - height[1]
@@ -49,14 +50,15 @@ def draw():
   db.draw_line_with_scale([xoffset, yoffset], -4, height[1], True)
   db.draw_line_with_scale([xoffset+gap_tan[0], yoffset+height[1]], -4, height[0], True)
   db.draw_line_with_scale([xoffset, yoffset-lead[1]*2], -18+gap_tan[0],
-                       height[0]+height[1]*2+lead[1]*4, True)
+                          height[0]+height[1]*2+lead[1]*4, True)
   # db.draw_text([xoffset+width/2, 260], 'Front view', False, 6 )
   db.draw_text([xoffset+6.5, yoffset-lead[1]*2+1.5], 'Lead')
   db.draw_beam_mark([xoffset+width/2, yoffset-lead[1]*2-10], 5)
   db.draw_text([xoffset+width/2-12, yoffset-lead[1]*2-11.5], 'Beam')
-  db.draw_text([xoffset, 245], '(b)', text_size=7)
+  db.draw_text([xoffset, 230], '(a)' if version == 2016 else '(b)', text_size=7)
+
   # cross-sectional view
-  xoffset = (a4size[0]-width)/2+open_tan[0]+40
+  xoffset = (a4size[0]-width)/2+open_tan[0]+30
   yoffset = a4size[1]/2
   db.draw_square([xoffset, yoffset], width, t, line_width, fcolor)
   db.draw_square([xoffset+gap_tan[0], yoffset], w_tan, t_tan, line_width, fcolor)

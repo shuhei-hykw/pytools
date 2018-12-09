@@ -82,11 +82,11 @@ def draw():
   db.draw_arrow([x-hframe[2]/2+aerogel[2]-3,
                  y+height*0.8-3],
                 hframe[2]-aerogel[2]+6, 4, 3)
-  db.draw_text([x+hframe[2]/2+28, y+height*0.8],
-               'Silica aerogel (n=1.05)')
+  db.draw_text([x+hframe[2]/2+4, y+height*0.8],
+               'Silica aerogel (n=1.05)', centering=False)
   db.draw_arrow([x+hframe[2]/2,
                  y+height*0.1+1.5], 3.5, 0, 3)
-  db.draw_text([x+hframe[2]/2+18, y+height*0.1], 'Teflon mirror')
+  db.draw_text([x+hframe[2]/2+4, y+height*0.1], 'Teflon reflector', centering=False)
   db.draw_arrow([x-hframe[2]/2-5, y+height/2], hframe[2]+10, 0, 2)
-  db.draw_text([x+hframe[2]/2+8, y+height/2+3], 'Beam')
-  db.draw_text([x+hframe[2]/2+30, y-pmt[1]-6], '[mm]')
+  db.draw_text([x+hframe[2]/2+4, y+height/2+3], 'Beam', centering=False)
+  # db.draw_text([x+hframe[2]/2+30, y-pmt[1]-6], '[mm]')

@@ -28,6 +28,7 @@ Supported targets are as follows.
  - DAQ
  - MICROSCOPE
  - PATTERN
+ - TRACKFOLLOW
  - SU3
  - OCTET
 '''
@@ -57,6 +58,7 @@ import draw_pvac
 import draw_sdc123
 import draw_ssd
 import draw_su3
+import draw_trackfollow
 import draw_trigger
 import settings
 
@@ -65,6 +67,7 @@ supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'FBH_MPPC', 'MPPC_CIRCUIT', 'PVAC', 'FAC', 'SDC1',
              'SCH', 'SCH_MPPC', 'SDC2', 'SDC3', 'TOF',
              'SSD', 'DIAMOND', 'EMULSION', 'CASSETTE', 'MICROSCOPE',
+             'TRACKFOLLOW',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT',
              'PATTERN']
 
@@ -85,6 +88,8 @@ def draw_target():
     draw_emulsion.draw()
   elif settings.target == 'CASSETTE':
     draw_cassette.draw()
+  elif settings.target == 'TRACKFOLLOW':
+    draw_trackfollow.draw()
   elif settings.target == 'TRIGGER':
     draw_trigger.draw()
   elif settings.target == 'MATRIX':

@@ -31,6 +31,7 @@ Supported targets are as follows.
  - TRACKFOLLOW
  - SU3
  - OCTET
+ - THORIUM
 '''
 
 import argparse
@@ -58,6 +59,7 @@ import draw_pvac
 import draw_sdc123
 import draw_ssd
 import draw_su3
+import draw_thorium
 import draw_trackfollow
 import draw_trigger
 import settings
@@ -69,7 +71,7 @@ supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'SSD', 'DIAMOND', 'EMULSION', 'CASSETTE', 'MICROSCOPE',
              'TRACKFOLLOW',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT',
-             'PATTERN']
+             'PATTERN', 'THORIUM']
 
 #_______________________________________________________________________________
 no_view_label = True
@@ -144,6 +146,8 @@ def draw():
     draw_baryon_octet.draw()
   elif settings.target == 'PRODUCT':
     draw_product.draw()
+  elif settings.target == 'THORIUM':
+    draw_thorium.draw()
   elif not settings.target in supported:
     raise Exception('%% target name \"{}\" is not supported'.format(settings.target))
   else:

@@ -32,6 +32,7 @@ Supported targets are as follows.
  - SU3
  - OCTET
  - THORIUM
+ - IBUKI
 '''
 
 import argparse
@@ -50,6 +51,7 @@ import draw_diamond
 import draw_emulsion
 import draw_fac
 import draw_hodoscope
+import draw_ibuki
 import draw_matrix
 import draw_microscope
 import draw_mppc
@@ -71,7 +73,7 @@ supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'SSD', 'DIAMOND', 'EMULSION', 'CASSETTE', 'MICROSCOPE',
              'TRACKFOLLOW',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT',
-             'PATTERN', 'THORIUM']
+             'PATTERN', 'THORIUM', 'IBUKI']
 
 #_______________________________________________________________________________
 no_view_label = True
@@ -136,6 +138,8 @@ def draw_target():
     draw_microscope.draw()
   elif settings.target == 'PATTERN':
     draw_pattern_match.draw()
+  elif settings.target == 'IBUKI':
+    draw_ibuki.draw()
 
 #_______________________________________________________________________________
 def draw():

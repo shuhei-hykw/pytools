@@ -37,11 +37,11 @@ def show():
       total_mol += mol[d]
       total_den += e['density'][d]
     for d in weight:
-      print('{:3} {:9.3f} {:8.4f} {:8.4f} {:8.4f}'
+      print('{:3} {:8.3f} {:9.4f} {:8.4f} {:8.4f}'
             .format(d, e['density'][d], mol[d],
                     mol[d]/total_mol, e['density'][d]/total_den))
-    print('{:3} {:9.4f} {:8.3f}'
-          .format('', total_mol, total_den))
+    print('{:3} {:8.3f} {:9.4f}'
+          .format('', total_den, total_mol))
     print()
 
 #_______________________________________________________________________________

@@ -1,0 +1,16 @@
+# name bxi_n bxi_s
+# Wilkinson		5.9	1.2	Wilkinson {}_{#Lambda}^{4}H+^{4}_{#Lambda}H
+# Wilkinson		3.6	1.2	a {}_{#Lambda}^{4}H+^{4}_{#Lambda}H+n
+KEK-E176-\#10-9-6	0.82	0.17	#splitline{KEK-E176}{#10-9-6}
+KEK-E176-\#10-9-6	-0.23	0.17	a {}^{4}_{#Lambda}H*
+KEK-E176-\#13-11-14	3.89	0.14	#splitline{KEK-E176}{#13-11-14}
+KEK-E176-\#13-11-14	2.84	0.15	a {}^{4}_{#Lambda}H*
+KEK-E176-\#13-11-14	0.82	0.14	a {}^{9}_{#Lambda}Be*
+KEK-E176-\#13-11-14	-0.19	0.15	a {}_{#Lambda}^{9}Be*+^{4}_{#Lambda}H*
+KISO			3.87	0.21	KISO
+KISO			1.03	0.18	KISO {}^{10}_{#Lambda}Be*
+IBUKI			1.32	0.20	IBUKI
+#Xi^{#minus}#plus^{14}N(_{#Lambda}^{10}Be*)
+#Xi^{#minus}#plus^{14}N
+#{}_{#Lambda}^{10}Be#plus_{#Lambda}^{5}He
+#Xi^{#minus}#plus^{14}N

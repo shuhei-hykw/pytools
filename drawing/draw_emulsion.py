@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import draw_basic as db
 import settings
 
 version = 2
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw():
   full_draw = True
   unit = 1e0
@@ -23,8 +22,9 @@ def draw():
   thick_full = thick_gel * 2 + thick_base
   space = 0
   zigzag = 2 if full_draw else 2
-  x = 10
+  x = 10+settings.text_size
   y = 40
+  xstart = x
   ystart = y
   lw = 0.4
   lw2 = 0.1
@@ -34,7 +34,7 @@ def draw():
   db.draw_square([x, y], thin_full, height, lw, fc)
   db.draw_square([x+thin_gel, y2], thin_base, height, lw2)
   db.draw_line_with_scale([x, y+height], thin_gel, 5, True)
-  db.draw_line_with_scale([x+thin_gel, y+height], thin_base, 10)
+  db.draw_line_with_scale([x+thin_gel, y+height], thin_base, 15)
   db.draw_line_with_scale([x+thin_gel+thin_base, y+height], thin_gel, 5)
   x = x + 2*thin_gel + thin_base + space
   height -= zigzag
@@ -62,22 +62,37 @@ def draw():
   ''' crip '''
   db.draw_square([9, y-1], x-8, height/4, 0, 1)
   ''' scale '''
-  db.draw_text([10+thin_gel+thin_base/2, y+height/4-8], 'thin-type sheet')
-  db.draw_text([(10+x)/2, y+height/4-8], '11 thick-type sheets')
-  db.draw_text([x-thin_gel-thin_base/2, y+height/4-8], 'thin-type sheet')
+  db.draw_arrow([xstart, y+height/4-2.5], thin_full, 0)
+  db.draw_text([xstart+thin_gel+thin_base/2,
+                y+height/4-2.5-settings.text_size],
+               'thin-type sheet')
+  db.draw_arrow([xstart+thin_full, y+height/4-2.5], thick_full*3.5, 0)
+  db.draw_text([(xstart+x)/2, y+height/4-2.5-settings.text_size],
+               '11 thick-type sheets')
+  db.draw_arrow([x-thin_full, y+height/4-2.5], thin_full, 0)
+  db.draw_text([x-thin_gel-thin_base/2, y+height/4-2.5-settings.text_size],
+               'thin-type sheet')
   db.draw_text([x-thin_gel-thin_base/2, y+height+4+zigzag], 'base film')
   db.draw_arrow([x-thin_gel-thin_base/2, y+height+2+zigzag], 0, -4-zigzag, 3)
-  db.draw_text([x-thin_full-thick_full+thick_gel/2, y+height+4+zigzag], 'emulsion layer')
-  db.draw_arrow([x-thin_full-thick_full+thick_gel/2, y+height+2+zigzag], 0, -4, 3)
-  db.draw_text([x+15, y], '[um]')
-  width = x - 10
+  db.draw_text([x-thin_full-thick_full+thick_gel/2,
+                y+height+1.8*settings.text_size+zigzag],
+               'emulsion layer')
+  db.draw_arrow([x-thin_full-thick_full+thick_gel/2,
+                 y+height+1.8*settings.text_size+zigzag-2],
+                0, -1.8*settings.text_size-2, 3)
+  # db.draw_text([x+5+settings.text_size*2.5, y], '[um]')
+  db.draw_text([x+5, y-settings.text_size*1.5],
+               '[  m]')
+  db.draw_text([x+5-settings.text_size/2.4, y-settings.text_size*1.5],
+               'm', font='Symbol')
+  width = x - xstart
   if not full_draw:
-    db.draw_line_with_scale([10, y+height+20], width, 5)
+    db.draw_line_with_scale([xstart, y+height+20], width, 5)
     return
   ''' entire '''
   scale = 1.0
-  x = 10
-  y = ystart + height + 30
+  x = xstart
+  y = ystart + height + 25 #30
   print('[1 1] 0 setdash')
   db.draw_polygon3d([x, y+25], [60*scale, -10*scale], [0, 70*scale], [10*scale, 5*scale], 0.1, fc)
   print('[] 0 setdash')
@@ -91,13 +106,16 @@ def draw():
   print('[] 0 setdash')
   db.draw_polygon3d([x+15, y+42], [27*scale, -4.5*scale], [0, 26*scale], [0.4*scale, 0.2*scale], 0.1, 0.75)
   db.draw_polygon3d([x+13, y+45], [18*scale, -3*scale], [0, 10*scale], [7*scale, 3.5*scale], 0.2, 0.5)
-  db.draw_text([x+5, y+46], 'K', False, 6, 'Times-Italic')
-  db.draw_text([x+5+3.5, y+48], '-', False, 7, 'Times-Italic')
+  db.draw_text([x+5, y+46], 'K', False, font='Times-Italic')
+  db.draw_text([x+5+settings.text_size/1.8, y+46+settings.text_size/3],
+               '-', False, settings.text_size*1.2, 'Times-Italic')
   db.draw_arrow([x+23, y+36], 0, 10, 3)
-  db.draw_text([x+23, y+32], 'Diamond target')
-  db.draw_arrow([x+34, y+17], 4, 4, 3)
-  db.draw_text([x+16, y+14], 'Emulsion module')
-  db.draw_arrow([x+18, y+64], -4, 8, 3)
+  db.draw_text([x+19+settings.text_size, y+37-settings.text_size],
+               'Diamond target')
+  db.draw_arrow([x+16+settings.text_size*3.6, y+11+settings.text_size*0.6],
+                4, 4, 3)
+  db.draw_text([x+16, y+12], 'Emulsion module')
+  db.draw_arrow([x+18, y+64], -4, 8, 3) # SSD1
   if version == 1:
     db.draw_text([x+13, y+80], 'Upstream')
     db.draw_text([x+13, y+74], 'SSD')
@@ -107,7 +125,7 @@ def draw():
     db.draw_text([x+13, y+74], 'SSD1')
     db.draw_text([x+42, y+75], 'SSD2')
   db.draw_arrow([x+38, y+69], 2, 4, 3)
-  db.draw_arrow([18, y+43], 12, 6, 2, '', 0.8, 3)
+  db.draw_arrow([x+8, y+43], 12, 6, 2, '', 0.8, 3)
   # nwave = int(60/10)
   # for i in range(nwave):
   #   moveto = [x+60/nwave*i, y+95-i*10/nwave]
@@ -123,13 +141,14 @@ def draw():
   #   print('stroke')
   ''' circle '''
   scale = 2.0
-  x = 10 + 3.7/7*width
-  y = ystart + height + 35
+  x = xstart + 3.7/7*width
+  y = ystart + height + 38 # 35
   r = 50
   center = [x+r, y+r]
   dw = 30*scale
   ssdw1 = 1.8*scale
-  ssdw2 = 2.3*scale
+  #ssdw2 = 2.3*scale
+  ssdw2 = 1.8*scale
   air1 = 1.6*scale
   emw = 11.76*scale
   air2 = 23.8*scale - air1 - emw
@@ -141,9 +160,10 @@ def draw():
   db.draw_square([x+ssdw1+air1, 0], emw, 300, lw, fc)
   db.draw_square([x+ssdw1+air1+emw+air2, 0], ssdw2, 300, lw, 0.75)
   print('initclip')
-  db.draw_text([x-dw/2, y+r+32], 'Diamond')
-  db.draw_text([x-dw/2, y+r+27], 'target')
-  db.draw_text([x+ssdw1+air1+emw/2, y+2*r+8], 'Emulsion')
+  db.draw_text([x-dw/2, y+r+23+1.9*settings.text_size], 'Diamond')
+  db.draw_text([x-dw/2, y+r+23+settings.text_size], 'target')
+  db.draw_text([x+ssdw1+air1+emw/2, y+2*r+3+.9*settings.text_size],
+               'Emulsion')
   db.draw_text([x+ssdw1+air1+emw/2, y+2*r+3], 'module')
   if version == 1:
     db.draw_text([x+ssdw1/2-8, y+2*r+3], 'Upstream')
@@ -155,19 +175,22 @@ def draw():
     db.draw_text([x+ssdw1+air1+emw+air2+ssdw2, y+2*r-6], 'SSD2')
   db.draw_arrow([x+ssdw1+air1+emw, y-2], 0, -8, 3)
   db.draw_arrow([x+ssdw1+air1, y-2], 0, -8, 3)
-  db.draw_arrow([10, y-10], (x+ssdw1+air1)-10, 0, 3)
-  db.draw_arrow([10, y-10], 0, -4, 3)
-  db.draw_arrow([x+ssdw1+air1+emw, y-10], 10+width-(x+ssdw1+air1+emw), 0, 3)
-  db.draw_arrow([10+width, y-10], 0, -4, 3)
+  db.draw_arrow([xstart, y-10], (x+ssdw1+air1)-xstart, 0, 3)
+  db.draw_arrow([xstart, y-10], 0, -4, 3)
+  db.draw_arrow([x+ssdw1+air1+emw, y-10], xstart+width-(x+ssdw1+air1+emw), 0, 3)
+  db.draw_arrow([xstart+width, y-10], 0, -4, 3)
   x -= dw/2
   db.draw_arrow([x-10, y+r], 30, 0, 3, '', lw)
   db.draw_arrow([x+20, y+r], 80, 30, 2, '', lw, 2.5)
   db.draw_arrow([x+20, y+r], 30, -20, 3, '', lw, 2.5)
   #db.draw_circle([x+50, y+r-20], 0.5, 0.1)
-  db.draw_text([x-10, y+r+2], 'K', False, 6, 'Times-Italic')
-  db.draw_text([x-10+3.5, y+r+4], '-', False, 7, 'Times-Italic')
-  db.draw_text([x+95, y+r+32], 'K', False, 6, 'Times-Italic')
-  db.draw_text([x+95+3.5, y+r+34], '+', False, 4, 'Times-Italic')
-  db.draw_text([x+50, y+r-27], 'X', False, 6, 'Symbol')
-  db.draw_text([x+50+3.5, y+r-25], '-', False, 7, 'Times-Italic')
+  db.draw_text([x-10, y+r+2], 'K', False, font='Times-Italic')
+  db.draw_text([x-10+settings.text_size/1.8, y+r+2+settings.text_size/3],
+               '-', False, settings.text_size*1.2, 'Times-Italic')
+  db.draw_text([x+95, y+r+32], 'K', False, font='Times-Italic')
+  db.draw_text([x+95+settings.text_size/1.8, y+r+32+settings.text_size/3],
+               '+', False, settings.text_size*0.7, 'Times-Italic')
+  db.draw_text([x+50, y+r-27], 'X', False, font='Symbol')
+  db.draw_text([x+50+settings.text_size/1.8, y+r-27+settings.text_size/3],
+               '-', False, settings.text_size*1.2, 'Times-Italic')
   db.draw_circle([center[0], center[1]], r, -1, 0, 360, 0.1)

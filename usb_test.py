@@ -5,19 +5,19 @@ import time
 
 DEVICE = '/dev/ttyUSB1'
 TERM = '\r\n'
+PARITY = serial.PARITY_ODD
+BAUDRATE = 57600
 
 if __name__ == '__main__':
   try:
     print(f'DEVICE = {DEVICE}')
-    s = serial.Serial(DEVICE,
-                      parity=serial.PARITY_ODD,
-                      baudrate=57600,
+    s = serial.Serial(DEVICE, parity=PARITY,
+                      baudrate=BAUDRATE,
                       timeout=0.5)
     print('connected')
     while True:
       try:
         data = input('>> ')
-        # data = 'rdgfield?'
         # data = '*idn?'
       except (KeyboardInterrupt, EOFError) as e:
         print(e)

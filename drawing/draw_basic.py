@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import datetime
 import math
 
 import settings
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_beam_mark(moveto, r, lw=0.1):
   x = r*math.sqrt(2)
   y = r*math.sqrt(2)
@@ -14,7 +13,7 @@ def draw_beam_mark(moveto, r, lw=0.1):
   draw_line([moveto[0]-x/2, moveto[1]+y/2], x, -y, lw=lw)
   draw_circle(moveto, r, fc=-1, lw=lw)
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_line(moveto, x, y, color='black', lw=0.1, dash=None):
   ''' draw line '''
   if x == 0 and y == 0: return
@@ -32,7 +31,7 @@ def draw_line(moveto, x, y, color='black', lw=0.1, dash=None):
   print('{} {} rlineto'.format(x, y))
   print('{} setlinewidth stroke'.format(lw))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0, mfill=0.):
   # mark = 0:both 1:first 2:last 3:none
   ''' draw arrow '''
@@ -85,7 +84,7 @@ def draw_arrow(moveto, width, height, mark=0, color='black', lw=0.1, msize=1.0, 
     print('{} {} rlineto'.format(mf[0] - mi[0], mf[1] - mi[1]))
     print('closepath gsave fill grestore {} setlinewidth stroke'.format(lw))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_elip(moveto, r, ratio, theta=0, fill_color=1.0, line_width=0.1,
               begin=0, end=360):
   print('/cmtx matrix currentmatrix def')
@@ -94,7 +93,7 @@ def draw_elip(moveto, r, ratio, theta=0, fill_color=1.0, line_width=0.1,
   print('newpath 1.0 {} scale 0 0 {} {} {} arc'.format(ratio, r, begin, end))
   print('cmtx setmatrix stroke closepath grestore')
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_circle(moveto, r, fc=1.0, a=0, b=360, lw=0.1):
   ''' draw circle '''
   print('newpath {} {} moveto'.format(moveto[0]+r, moveto[1]))
@@ -105,8 +104,9 @@ def draw_circle(moveto, r, fc=1.0, a=0, b=360, lw=0.1):
   if lw > 0:
     print('{} setlinewidth stroke'.format(lw))
 
-#_______________________________________________________________________________
-def draw_text(moveto, text, rotate=False, text_size=5, font='Times-Roman', centering=True):
+#______________________________________________________________________________
+def draw_text(moveto, text, rotate=False, text_size=settings.text_size,
+              font='Times-Roman', centering=True):
   ''' draw text '''
   print('0 setgray')
   print('/{} findfont {} scalefont setfont'.format(font, text_size))
@@ -118,10 +118,10 @@ def draw_text(moveto, text, rotate=False, text_size=5, font='Times-Roman', cente
     print('dup stringwidth pop 2 div 0 exch sub 0 rmoveto'.format(text))
   print('{} show {}'
         .format('90 rotate' if rotate else '', '-90 rotate' if rotate else ''))
-  print('/Times-Roman findfont {} scalefont setfont'.format(settings.text_size))
+  print('/Times-Roman findfont {} scalefont setfont'.format(text_size))
 
-#_______________________________________________________________________________
-def draw_text_box(moveto, text, text_size=5.):
+#______________________________________________________________________________
+def draw_text_box(moveto, text, text_size=settings.text_size):
   ''' draw text box '''
   t = text.split()
   w = (text_size*max(len(t[0]), len(t[1]))
@@ -139,9 +139,9 @@ def draw_text_box(moveto, text, text_size=5.):
   print('{} {} moveto'.format(moveto[0]+w/2, moveto[1]))
   print('({}) dup stringwidth pop neg 2 div 0 rmoveto'.format(text))
   print('0 {} rmoveto show'.format(h/2.-text_size/3))
-  print('/Times-Roman findfont {} scalefont setfont'.format(settings.text_size))
+  print('/Times-Roman findfont {} scalefont setfont'.format(text_size))
 
-  #_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_line_with_scale(moveto, width, height, rotate=False):
   ''' draw line with scale '''
   rwidth = width/settings.scale
@@ -150,7 +150,7 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
   if settings.target == 'EMULSION':
     lr = -1 if rotate else 1
     rotate= False
-  if settings.target != 'BACp':
+  if settings.target != 'BAC':
     for i in range(2):
       if rotate:
         print('newpath {} {} moveto'.format(moveto[0], moveto[1]+i*height))
@@ -186,9 +186,9 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
     if settings.target == 'EMULSION' and width > 2:
       moveto[1] += height * 0.75
       draw_arrow(moveto, width, 0)
-      moveto[1] += height * 0.25
+      moveto[1] += height * 0.3
       if rwidth == 100:
-        moveto[0] += lr*width*0.75
+        moveto[0] += lr*width*settings.text_size*0.15
     elif width > 5 or 'BC' in settings.target or settings.target == 'BFT':
       moveto[1] += height * 0.75
       draw_arrow(moveto, width, 0)
@@ -201,6 +201,11 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
       moveto[0] += -width/2 + 3
       if settings.target == 'CASSETTE':
         moveto[0] += 1
+      if settings.target == 'EMULSION':
+        # moveto[0] += settings.text_size*0.3
+        moveto[0] -= width/2 + 3
+        moveto[1] += height*0.3
+        # moveto[1] += settings.text_size*0.25
         # moveto[1] += 1
       if abs(round(rwidth) - rwidth) > 0.1:
         moveto[0] += -width/2 + 3
@@ -211,7 +216,9 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
                  1805 if settings.target == 'TOF' and width > 100 else
                  673 if settings.target == 'SCH' and width > 100 else
                  height/settings.scale if rotate else rwidth)
-  real_length = round(real_length) if abs(real_length - round(real_length)) < 0.001 else float('{:.2f}'.format(real_length))
+  real_length = (round(real_length)
+                 if abs(real_length - round(real_length)) < 0.001
+                 else float('{:.2f}'.format(real_length)))
   if rotate:
     print('({}) dup stringwidth pop 0 exch -2 div 0 exch rmoveto'.format(real_length))
   print('({}) dup stringwidth pop -2 div 0 rmoveto {} show {}'
@@ -219,7 +226,7 @@ def draw_line_with_scale(moveto, width, height, rotate=False):
                 '90 rotate' if rotate else '',
                 '-90 rotate' if rotate else ''))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_polygon(moveto, array, line_width=0.1, fill_color=1.0):
   ''' draw polygon '''
   print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
@@ -231,7 +238,7 @@ def draw_polygon(moveto, array, line_width=0.1, fill_color=1.0):
   if line_width > 0:
     print('0.0 setgray {} setlinewidth stroke'.format(line_width))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_polygon3d(moveto, w, h, t, lw, fc):
   ''' draw_polygon3d '''
   wr = [-w[0], -w[1]]
@@ -241,7 +248,7 @@ def draw_polygon3d(moveto, w, h, t, lw, fc):
   draw_polygon([moveto[0]+w[0]+h[0], moveto[1]+w[1]+h[1]], [hr, t, h, tr], lw, fc)
   draw_polygon([moveto[0]+w[0]+h[0], moveto[1]+w[1]+h[1]], [t, wr, tr, w], lw, fc)
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_square(moveto, width, height, line_width=0.1, fill_color=1.0):
   ''' draw square '''
   if settings.target == 'DAQ':
@@ -256,7 +263,7 @@ def draw_square(moveto, width, height, line_width=0.1, fill_color=1.0):
   if line_width > 0:
     print('{} setlinewidth gsave stroke grestore'.format(line_width))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_triangle(moveto, width, height, line_width=0.1, fill_color=1.0, rotate=False):
   ''' draw square '''
   if settings.target == 'DAQ':
@@ -274,7 +281,7 @@ def draw_triangle(moveto, width, height, line_width=0.1, fill_color=1.0, rotate=
   if line_width > 0:
     print('{} setlinewidth gsave stroke grestore'.format(line_width))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_logic_or(moveto, size=1.0, etcline=True):
   ''' draw AND logic '''
   height = 1*size
@@ -295,7 +302,7 @@ def draw_logic_or(moveto, size=1.0, etcline=True):
         .format(moveto[0]-r*math.sqrt(3)/2, moveto[1]+r/2, r, 30, -30))
   print('closepath gsave 1 setgray fill grestore 0 setgray 0.1 setlinewidth stroke')
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_logic_and(moveto, size=1.0, etcline=False):
   ''' draw AND logic '''
   height = 1*size
@@ -317,7 +324,7 @@ def draw_logic_and(moveto, size=1.0, etcline=False):
   print('closepath')
   print('gsave 1 setgray fill grestore 0 setgray 0.1 setlinewidth stroke')
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def draw_wave(moveto, width, height, stroke=True):
   print('newpath {} {} moveto'.format(moveto[0], moveto[1]))
   print('{} {} {} {} {} {} curveto'.format(moveto[0]+width*1/3, moveto[1]+height,
@@ -325,7 +332,7 @@ def draw_wave(moveto, width, height, stroke=True):
                                            moveto[0]+width, moveto[1]))
   print('gsave 0.1 setlinewidth {}'.format('stroke closepath' if stroke else ''))
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def initialize():
   print('%!PS-Adobe-3.0 EPSF-3.0')
   print('%%Title: drawing of {}'.format(settings.target))

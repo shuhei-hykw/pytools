@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import argparse
 import os
 import sys
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 particle = []
 index_min = 1.0
 index_max = 1.3
 p_min = 0.0
 p_max = 2.0
 
-#_______________________________________________________________________________
+#______________________________________________________________________________
 def initialize():
-  particle.append({'name': '#font[12]{e}', 'pdg': 11, 'color': ROOT.kCyan+1, 'position': [0.1, 0.1]})
-  particle.append({'name': '#mu', 'pdg': 13, 'color': ROOT.kBlack, 'position': [0.21, 0.21]})
-  particle.append({'name': '#pi', 'pdg': 211, 'color': ROOT.kBlue+1, 'position': [0.32, 0.32]})
-  particle.append({'name': '#font[12]{K}', 'pdg': 321, 'color': ROOT.kGreen+1, 'position': [0.51, 0.51]})
-  particle.append({'name': '#font[12]{p}', 'pdg': 2212, 'color': ROOT.kRed+1, 'position': [0.71, 0.71]})
+  particle.append({'name': '#font[12]{e}', 'pdg': 11,
+                   'color': ROOT.kCyan+1, 'position': [0.1, 0.1]})
+  particle.append({'name': '#mu', 'pdg': 13,
+                   'color': ROOT.kBlack, 'position': [0.21, 0.21]})
+  particle.append({'name': '#pi', 'pdg': 211,
+                   'color': ROOT.kBlue+1, 'position': [0.32, 0.32]})
+  particle.append({'name': '#font[12]{K}', 'pdg': 321,
+                   'color': ROOT.kGreen+1, 'position': [0.51, 0.51]})
+  particle.append({'name': '#font[12]{p}', 'pdg': 2212,
+                   'color': ROOT.kRed+1, 'position': [0.71, 0.71]})
 
 #_______________________________________________________________________________
 def mass(pdg_code):
@@ -26,6 +30,7 @@ def mass(pdg_code):
 
 #_______________________________________________________________________________
 def show(target_index, gray_scale):
+  math = ROOT.TMath
   ROOT.gROOT.SetBatch()
   ROOT.gROOT.SetStyle('MyStyle')
   c1 = ROOT.TCanvas()
@@ -47,19 +52,20 @@ def show(target_index, gray_scale):
     n = 1 / b = sqrt( 1 + ( m / p )^2 )
     p = m / sqrt( n^2 -1 )
     '''
-    momentum_min = ROOT.TMath.Max( mass(p['pdg']) / ROOT.TMath.Sqrt(ROOT.TMath.Sq(index_max-0.005) - 1.),
+    momentum_min = max( mass(p['pdg']) / math.Sqrt(math.Sq(index_max-0.005) - 1.),
                                    p_min + 0.05 )
-    momentum_max = ROOT.TMath.Min( mass(p['pdg']) / ROOT.TMath.Sqrt(ROOT.TMath.Sq(index_min+0.005) - 1.),
+    momentum_max = min( mass(p['pdg']) / math.Sqrt(math.Sq(index_min+0.005) - 1.),
                                    p_max - 0.05 )
     try:
-      target_threshold = mass(p['pdg']) / ROOT.TMath.Sqrt(ROOT.TMath.Sq(target_index) - 1.)
+      target_threshold = mass(p['pdg']) / math.Sqrt(math.Sq(target_index) - 1.)
     except ZeroDivisionError:
-      target_threshold = ROOT.TMath.QuietNaN()
+      target_threshold = math.QuietNaN()
     f1 = ROOT.TF1('f{}'.format(p['name']),
                   'TMath::Sqrt( 1 + [0] / ( x*x ) )',
-                  momentum_min, momentum_max)
+                  0, 2)
+                  #momentum_min, momentum_max)
     f1.SetLineColor(ROOT.kBlack if gray_scale else p['color'])
-    f1.SetParameter(0, ROOT.TMath.Sq(mass(p['pdg'])))
+    f1.SetParameter(0, math.Sq(mass(p['pdg'])))
     f1.Draw('same')
     tex.SetTextColor(ROOT.kBlack if gray_scale else p['color'])
     tex.DrawLatex(p['position'][0], p['position'][1], p['name'])

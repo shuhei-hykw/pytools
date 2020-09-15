@@ -1,0 +1,34 @@
+[
+  {
+    "Name": "E07TwinMod047Pl10_D",
+    "InitialState": "SingleHyper",
+    "Density": 3.544,
+    "Fragments": [
+      {
+	"ID": 8,
+	"Range": [ 34.6, 19.1 ],
+	"Theta": [ 30.56, 1.52 ],
+	"Phi": [ 111.9, 2.79 ],
+	"Strangeness": 0,
+	"Kind": "Any"
+      },
+      {
+	"ID": 9,
+	"Range": [ 44.7, 3.6 ],
+	"Theta": [ 106.74, 1.58 ],
+	"Phi": [ 224.64, 1.22 ],
+	"Strangeness": 0,
+	"Kind": "Any"
+      },
+      {
+	"ID": 10,
+	"Range": [ 7.7, 3.6 ],
+	"Theta": [ 176.74, 1.58 ],
+	"Phi": [ 175.36, 1.22 ],
+	"Strangeness": 0,
+	"Kind": "Any"
+      }
+    ],
+    "MissingFragment": {}
+  }
+]

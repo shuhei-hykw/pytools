@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 '''
 Script for making PostScript of drawing.
@@ -33,6 +32,7 @@ Supported targets are as follows.
  - OCTET
  - THORIUM
  - IBUKI
+ - IBUKI-TRACK8
 '''
 
 import argparse
@@ -52,6 +52,7 @@ import draw_emulsion
 import draw_fac
 import draw_hodoscope
 import draw_ibuki
+import draw_ibuki_track8
 import draw_matrix
 import draw_microscope
 import draw_mppc
@@ -73,7 +74,7 @@ supported = ['BH1', 'BFT', 'BAC', 'BH2', 'COLLIMATOR', 'BC34', 'FBH',
              'SSD', 'DIAMOND', 'EMULSION', 'CASSETTE', 'MICROSCOPE',
              'TRACKFOLLOW',
              'TRIGGER', 'MATRIX', 'DAQ', 'SU3', 'OCTET', 'PRODUCT',
-             'PATTERN', 'THORIUM', 'IBUKI']
+             'PATTERN', 'THORIUM', 'IBUKI', 'IBUKI-TRACK8']
 
 #_______________________________________________________________________________
 no_view_label = True
@@ -140,6 +141,8 @@ def draw_target():
     draw_pattern_match.draw()
   elif settings.target == 'IBUKI':
     draw_ibuki.draw()
+  elif settings.target == 'IBUKI-TRACK8':
+    draw_ibuki_track8.draw()
 
 #_______________________________________________________________________________
 def draw():
